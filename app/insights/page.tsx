@@ -1,63 +1,83 @@
+"use client";
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { BarChart3, TrendingUp, Users, Map, Database } from "lucide-react";
 import Container from "@/components/layout/Container";
 
+function useCountUp(target: number, duration = 1800) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started.current) {
+        started.current = true;
+        const start = performance.now();
+        const tick = (now: number) => {
+          const progress = Math.min((now - start) / duration, 1);
+          const ease = 1 - Math.pow(1 - progress, 3);
+          setCount(Math.round(ease * target));
+          if (progress < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.3 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [target, duration]);
+
+  return { count, ref };
+}
+
+const kpis = [
+  { label: "Daily Bus Rides",      value: 42800, suffix: "+",  color: "#16a34a",  bar: 78 },
+  { label: "Air Quality Index",    value: 42,    suffix: "",   color: "#0891b2",  bar: 42 },
+  { label: "Energy Saved (MWh)",   value: 1240,  suffix: "+",  color: "#7c3aed",  bar: 62 },
+  { label: "Active Smart Lights",  value: 8400,  suffix: "+",  color: "#d97706",  bar: 88 },
+  { label: "Incidents Resolved",   value: 318,   suffix: "",   color: "#2563eb",  bar: 91 },
+  { label: "New Trees Planted",    value: 5100,  suffix: "+",  color: "#16a34a",  bar: 51 },
+];
+
+function KpiCard({ label, value, suffix, color, bar }: typeof kpis[0]) {
+  const { count, ref } = useCountUp(value);
+  return (
+    <div ref={ref} className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">{label}</p>
+      <p className="text-4xl font-bold mb-4" style={{ color }}>
+        {count.toLocaleString()}{suffix}
+      </p>
+      <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-1000"
+          style={{ width: `${bar}%`, background: color }}
+        />
+      </div>
+    </div>
+  );
+}
+
 const insightCategories = [
-  {
-    icon: TrendingUp,
-    color: "text-amber-700",
-    bg: "bg-amber-50",
-    title: "Live KPI Dashboard",
-    description: "Track Magdeburg's key performance indicators across safety, transport, climate, and energy in a single real-time view.",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
-    delay: "delay-100",
-  },
-  {
-    icon: Users,
-    color: "text-blue-700",
-    bg: "bg-blue-50",
-    title: "Citizen Feedback",
-    description: "Aggregated sentiment and satisfaction data from residents, collected via the smart city portal and public kiosks.",
-    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80",
-    delay: "delay-200",
-  },
-  {
-    icon: Map,
-    color: "text-green-700",
-    bg: "bg-green-50",
-    title: "District Heatmaps",
-    description: "Interactive maps showing neighbourhood-level data on noise, traffic, air quality, and public service usage.",
-    image: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=600&q=80",
-    delay: "delay-300",
-  },
-  {
-    icon: Database,
-    color: "text-violet-700",
-    bg: "bg-violet-50",
-    title: "Open Data Portal",
-    description: "Anonymised city data made available to researchers, developers, and citizens to foster innovation and transparency.",
-    image: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=600&q=80",
-    delay: "delay-400",
-  },
+  { icon: TrendingUp, color: "text-amber-700",  bg: "bg-amber-50",  title: "Live KPI Dashboard",  description: "Track Magdeburg's key performance indicators across safety, transport, climate, and energy in a single real-time view.",    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80", delay: "delay-100" },
+  { icon: Users,      color: "text-blue-700",   bg: "bg-blue-50",   title: "Citizen Feedback",     description: "Aggregated sentiment and satisfaction data from residents, collected via the smart city portal and public kiosks.",         image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80", delay: "delay-200" },
+  { icon: Map,        color: "text-green-700",  bg: "bg-green-50",  title: "District Heatmaps",    description: "Interactive maps showing neighbourhood-level data on noise, traffic, air quality, and public service usage.",              image: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=600&q=80", delay: "delay-300" },
+  { icon: Database,   color: "text-violet-700", bg: "bg-violet-50", title: "Open Data Portal",      description: "Anonymised city data made available to researchers, developers, and citizens to foster innovation and transparency.",     image: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=600&q=80", delay: "delay-400" },
 ];
 
 const stats = [
-  { value: "140+", label: "Live Data Streams" },
-  { value: "3.8M", label: "Data Points / Day" },
-  { value: "28", label: "City Districts Covered" },
-  { value: "99.7%", label: "Dashboard Uptime" },
+  { value: "140+",   label: "Live Data Streams" },
+  { value: "3.8M",   label: "Data Points / Day" },
+  { value: "28",     label: "City Districts" },
+  { value: "99.7%",  label: "Dashboard Uptime" },
 ];
 
 export default function Insights() {
   return (
     <div className="bg-[#f8fafc] min-h-screen">
       <section className="relative h-[420px] sm:h-[480px]">
-        <Image
-          src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=85"
-          alt="City Insights"
-          fill priority sizes="100vw"
-          className="object-cover object-center"
-        />
+        <Image src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=85" alt="City Insights" fill priority sizes="100vw" className="object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#061B46]/90 via-[#061B46]/60 to-transparent" />
         <div className="absolute inset-0 flex items-center">
           <Container>
@@ -86,6 +106,17 @@ export default function Insights() {
         </Container>
       </section>
 
+      {/* Live KPI Dashboard */}
+      <section className="py-16 bg-white border-b border-slate-100">
+        <Container>
+          <h2 className="text-3xl font-bold text-[#061B46] mb-2 animate-fade-up">Live City Dashboard</h2>
+          <p className="text-slate-500 mb-10 animate-fade-up delay-100">Real-time metrics updating every 60 seconds across all smart city systems.</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+            {kpis.map((kpi) => <KpiCard key={kpi.label} {...kpi} />)}
+          </div>
+        </Container>
+      </section>
+
       <section className="py-20">
         <Container>
           <h2 className="text-3xl font-bold text-[#061B46] mb-3 animate-fade-up">Insight Categories</h2>
@@ -100,9 +131,7 @@ export default function Insights() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                   </div>
                   <div className="p-6 flex flex-col flex-1">
-                    <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-full ${item.bg}`}>
-                      <Icon className={`h-6 w-6 ${item.color}`} />
-                    </div>
+                    <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-full ${item.bg}`}><Icon className={`h-6 w-6 ${item.color}`} /></div>
                     <h3 className="text-lg font-semibold text-[#061B46]">{item.title}</h3>
                     <p className="mt-2 text-sm leading-7 text-slate-500 flex-1">{item.description}</p>
                   </div>
