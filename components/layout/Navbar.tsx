@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Bell, ChevronDown, Menu, X } from "lucide-react";
 
 const navItems = [
@@ -17,6 +18,10 @@ const navItems = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-[#e8edf5]">
@@ -40,11 +45,15 @@ export default function Navbar() {
             <Link
               key={item.label}
               href={item.href}
-              className="relative flex h-full items-center text-[14px] font-medium text-[#061B46] transition hover:text-blue-700"
+              className={`relative flex h-full items-center text-[14px] font-medium transition ${
+                isActive(item.href)
+                  ? "text-blue-700"
+                  : "text-[#061B46] hover:text-blue-700"
+              }`}
             >
               {item.label}
-              {item.label === "Home" && (
-                <span className="absolute bottom-0 left-1/2 h-[2px] w-[70px] -translate-x-1/2 rounded-full bg-[#061B46]" />
+              {isActive(item.href) && (
+                <span className="absolute bottom-0 left-1/2 h-[2px] w-full -translate-x-1/2 rounded-full bg-blue-700" />
               )}
             </Link>
           ))}
@@ -84,7 +93,11 @@ export default function Navbar() {
                 key={item.label}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="rounded-xl px-4 py-3 text-[15px] font-medium text-[#061B46] hover:bg-[#f4f7fb]"
+                className={`rounded-xl px-4 py-3 text-[15px] font-medium transition ${
+                  isActive(item.href)
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-[#061B46] hover:bg-[#f4f7fb]"
+                }`}
               >
                 {item.label}
               </Link>

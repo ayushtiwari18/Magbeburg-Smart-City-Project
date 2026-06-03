@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏙️ Magdeburg Smart City Platform
 
-## Getting Started
+> Built for the **Magdeburg Smart City Hackathon** — a civic tech initiative by Landeshauptstadt Magdeburg (Saxony-Anhalt, Germany).
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js) ![React](https://img.shields.io/badge/React-19-blue?logo=react) ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript) ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-4-06B6D4?logo=tailwindcss)
+
+---
+
+## 📌 About the Project
+
+This platform is a **smart city dashboard** for Magdeburg, Germany — visualising initiatives, data, and projects across five key urban domains. It was created as a hackathon submission to demonstrate how digital technology can improve city life for residents and planners alike.
+
+### 🎯 Hackathon Context
+The project was submitted as part of the official Magdeburg citizen participation portal:
+🔗 [beteiligung.sachsen-anhalt.de](https://beteiligung.sachsen-anhalt.de/portal/magdeburg/beteiligung/themen/1003460)
+
+---
+
+## ✨ Features
+
+| Section | Description |
+|---|---|
+| 🛡️ **Safety** | Smart surveillance, SOS stations, community watch |
+| 🚌 **Smart Transportation** | Live bus tracking, e-bike sharing, multimodal routing |
+| 🌿 **Climate** | Air quality sensors, urban greening, heat island reduction |
+| 💡 **AI Streetlights** | Adaptive brightness, predictive maintenance, energy savings |
+| 📊 **City Insights** | Live KPI dashboard, open data portal, district heatmaps |
+| 📁 **Projects** | Transparent overview of all smart city initiatives & status |
+| ℹ️ **About** | Vision, mission, and governance pillars |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org) (App Router)
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS v4
+- **Icons**: [Lucide React](https://lucide.dev)
+- **Font**: Geist (via `next/font`)
+- **Package Manager**: pnpm
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- pnpm (`npm install -g pnpm`)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Clone the repo
+git clone https://github.com/ayushtiwari18/Magbeburg-Smart-City-Project.git
+cd Magbeburg-Smart-City-Project
+
+# Install dependencies
+pnpm install
+
+# Start development server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm build
+pnpm start
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+├── app/
+│   ├── layout.tsx          # Root layout (Navbar + Footer)
+│   ├── page.tsx            # Homepage (Hero + FeatureGrid)
+│   ├── safety/             # Safety page
+│   ├── transportation/     # Smart Transportation page
+│   ├── climate/            # Climate page
+│   ├── ai-streetlights/    # AI Streetlights page
+│   ├── insights/           # City Insights page
+│   ├── projects/           # Projects overview page
+│   ├── about/              # About / Vision page
+│   └── not-found.tsx       # Custom 404 page
+├── components/
+│   ├── home/
+│   │   ├── Hero.tsx        # Homepage hero banner
+│   │   └── FeatureGrid.tsx # Feature cards grid
+│   └── layout/
+│       ├── Navbar.tsx      # Sticky responsive navbar
+│       ├── Footer.tsx      # Footer with legal links
+│       └── Container.tsx   # Reusable max-width wrapper
+└── public/
+    └── image/              # City logo + banner image
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🎨 Design System
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Token | Value |
+|---|---|
+| Primary Navy | `#061B46` |
+| Accent Blue | `#6F8FD8` |
+| Background | `#f8fafc` |
+| Border | `#e8edf5` |
+| Font | Geist Sans |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 👥 Team
+
+Built with ❤️ for Magdeburg by [Ayush Tiwari](https://github.com/ayushtiwari18).
+
+---
+
+## 📄 License
+
+This project was created for hackathon purposes. All city branding assets belong to Landeshauptstadt Magdeburg.
