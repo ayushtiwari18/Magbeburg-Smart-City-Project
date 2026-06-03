@@ -15,6 +15,8 @@ const navItems = [
   { de: "KI-Straßenlichter",  en: "AI Streetlights",   href: "/ai-streetlights" },
   { de: "Projekte",           en: "Projects",          href: "/projects" },
   { de: "Einblicke",          en: "Insights",          href: "/insights" },
+  { de: "Veranstaltungen",    en: "Events",            href: "/events" },
+  { de: "Karte",              en: "Map",               href: "/map" },
 ];
 
 export default function Navbar() {
@@ -28,16 +30,17 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-[#e8edf5]">
       <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3 flex-shrink-0">
           <div className="relative h-14 w-44">
             <Image src="/image/ottostadt_magdeburg_logo.png" alt="Magdeburg Logo" fill priority sizes="176px" className="object-contain object-left" />
           </div>
         </Link>
 
-        <nav className="hidden h-full items-center gap-7 xl:flex">
+        {/* Desktop nav — scrollable on medium screens */}
+        <nav className="hidden md:flex h-full items-center gap-5 xl:gap-7 overflow-x-auto no-scrollbar flex-1 px-4">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href}
-              className={`relative flex h-full items-center text-[13.5px] font-medium transition ${
+              className={`relative flex-shrink-0 flex h-full items-center text-[13px] xl:text-[13.5px] font-medium transition ${
                 isActive(item.href) ? "text-blue-700" : "text-[#061B46] hover:text-blue-700"
               }`}
             >
@@ -47,19 +50,9 @@ export default function Navbar() {
               )}
             </Link>
           ))}
-          <Link href="/map"
-            className={`relative flex h-full items-center text-[13.5px] font-medium transition ${
-              pathname === "/map" ? "text-blue-700" : "text-[#061B46] hover:text-blue-700"
-            }`}
-          >
-            {lang === "de" ? "Karte" : "Map"}
-            {pathname === "/map" && (
-              <span className="absolute bottom-0 left-1/2 h-[2px] w-full -translate-x-1/2 rounded-full bg-blue-700" />
-            )}
-          </Link>
         </nav>
 
-        <div className="hidden items-center gap-4 xl:flex">
+        <div className="hidden md:flex items-center gap-4 flex-shrink-0">
           <button aria-label="Notifications" className="text-[#061B46] transition hover:text-blue-700">
             <Bell size={19} strokeWidth={1.9} />
           </button>
@@ -73,7 +66,7 @@ export default function Navbar() {
         </div>
 
         <button onClick={() => setOpen(!open)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#e1e7f0] text-[#061B46] xl:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#e1e7f0] text-[#061B46] md:hidden"
           aria-label="Toggle menu"
         >
           {open ? <X size={21} /> : <Menu size={21} />}
@@ -81,9 +74,9 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="border-t border-[#e8edf5] bg-white xl:hidden">
+        <div className="border-t border-[#e8edf5] bg-white md:hidden">
           <nav className="mx-auto flex max-w-[1440px] flex-col px-5 py-4 sm:px-8">
-            {[...navItems, { de: "Karte", en: "Map", href: "/map" }].map((item) => (
+            {navItems.map((item) => (
               <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
                 className={`rounded-xl px-4 py-3 text-[15px] font-medium transition ${
                   isActive(item.href) ? "bg-blue-50 text-blue-700" : "text-[#061B46] hover:bg-[#f4f7fb]"
