@@ -1,99 +1,101 @@
-import { Shield, AlertTriangle, PhoneCall, MapPin, Users, ChevronRight } from "lucide-react";
+import { Building2, Target, Globe2, HeartHandshake } from "lucide-react";
 import Container from "@/components/layout/Container";
 
-const safetyInitiatives = [
+const pillars = [
   {
-    icon: AlertTriangle,
+    icon: Target,
     color: "text-blue-700",
     bg: "bg-blue-50",
-    title: "Smart Surveillance",
+    title: "Our Mission",
     description:
-      "AI-powered camera networks monitor public spaces 24/7, detecting unusual activity and alerting emergency services in real time.",
+      "To transform Magdeburg into a leading European smart city by combining digital innovation with citizen-first urban planning.",
   },
   {
-    icon: PhoneCall,
+    icon: Globe2,
     color: "text-green-700",
     bg: "bg-green-50",
-    title: "Emergency Response",
+    title: "Sustainability",
     description:
-      "Integrated SOS stations placed across the city connect citizens directly to emergency services with one press.",
+      "Every initiative is designed with environmental responsibility at its core — targeting carbon neutrality by 2035.",
   },
   {
-    icon: MapPin,
+    icon: HeartHandshake,
     color: "text-violet-700",
     bg: "bg-violet-50",
-    title: "Incident Mapping",
+    title: "Citizen Participation",
     description:
-      "A live city-wide map tracks reported incidents, road hazards, and safety alerts to keep residents informed.",
+      "Residents are partners in building the smart city — from online surveys to open hackathons like this one.",
   },
   {
-    icon: Users,
+    icon: Building2,
     color: "text-amber-700",
     bg: "bg-amber-50",
-    title: "Community Watch",
+    title: "Governance",
     description:
-      "Citizens can report safety concerns via the app, building a collaborative network of community awareness.",
+      "Transparent, data-backed decision making ensures every euro invested in smart city infrastructure delivers measurable value.",
   },
 ];
 
-const stats = [
-  { value: "94%", label: "Response Rate" },
-  { value: "< 4 min", label: "Avg. Emergency Response Time" },
-  { value: "320+", label: "Smart Cameras Deployed" },
-  { value: "12K+", label: "Citizens Connected" },
-];
-
-export default function Safety() {
+export default function About() {
   return (
     <div className="bg-[#f8fafc] min-h-screen">
-      {/* Page Hero */}
       <section className="bg-white border-b border-slate-200">
         <Container className="py-14">
           <div className="flex items-center gap-4 mb-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
-              <Shield className="h-7 w-7 text-blue-700" />
+              <Building2 className="h-7 w-7 text-blue-700" />
             </div>
             <div>
               <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
                 Smart City Magdeburg
               </p>
               <h1 className="text-4xl font-bold text-[#061B46] tracking-tight">
-                Safety
+                About Our Vision
               </h1>
             </div>
           </div>
           <p className="mt-2 max-w-2xl text-lg text-slate-600 leading-relaxed">
-            Building a safer Magdeburg for every resident — through smart
-            technology, real-time monitoring, and community cooperation.
+            Magdeburg — Sachsen-Anhalt's capital and one of Germany's oldest
+            cities — is reimagining its future through smart technology,
+            sustainable infrastructure, and inclusive civic participation.
           </p>
         </Container>
       </section>
 
-      {/* Stats Strip */}
-      <section className="bg-[#061B46]">
+      {/* Vision Statement */}
+      <section className="py-16 bg-white border-b border-slate-200">
         <Container>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                className="flex flex-col items-center justify-center py-8 px-4 bg-[#061B46] text-center"
-              >
-                <span className="text-3xl font-bold text-white">{s.value}</span>
-                <span className="mt-1 text-sm text-blue-200">{s.label}</span>
+          <div className="max-w-3xl">
+            <div className="flex gap-5">
+              <div className="mt-1 h-full w-[4px] min-h-[80px] rounded-full bg-[#6F8FD8] flex-shrink-0" />
+              <div>
+                <h2 className="text-2xl font-bold text-[#061B46]">
+                  Smart City. Sustainable Future.
+                </h2>
+                <p className="mt-4 text-base leading-8 text-slate-600">
+                  By 2030, Magdeburg aims to be fully connected — where every
+                  street, service, and system speaks a common digital language.
+                  This platform is built to showcase and enable that
+                  transformation, created as part of the{" "}
+                  <span className="font-semibold text-[#061B46]">
+                    Magdeburg Smart City Hackathon
+                  </span>
+                  .
+                </p>
               </div>
-            ))}
+            </div>
           </div>
         </Container>
       </section>
 
-      {/* Initiatives Grid */}
+      {/* Pillars */}
       <section className="py-16">
         <Container>
           <h2 className="text-2xl font-bold text-[#061B46] mb-8">
-            Safety Initiatives
+            Our Pillars
           </h2>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {safetyInitiatives.map((item) => {
+            {pillars.map((item) => {
               const Icon = item.icon;
               return (
                 <div

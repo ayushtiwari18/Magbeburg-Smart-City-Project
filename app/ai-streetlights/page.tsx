@@ -1,75 +1,73 @@
-import { Shield, AlertTriangle, PhoneCall, MapPin, Users, ChevronRight } from "lucide-react";
+import { Lightbulb, Zap, Moon, Activity, BrainCircuit } from "lucide-react";
 import Container from "@/components/layout/Container";
 
-const safetyInitiatives = [
+const streetlightFeatures = [
   {
-    icon: AlertTriangle,
-    color: "text-blue-700",
-    bg: "bg-blue-50",
-    title: "Smart Surveillance",
-    description:
-      "AI-powered camera networks monitor public spaces 24/7, detecting unusual activity and alerting emergency services in real time.",
-  },
-  {
-    icon: PhoneCall,
-    color: "text-green-700",
-    bg: "bg-green-50",
-    title: "Emergency Response",
-    description:
-      "Integrated SOS stations placed across the city connect citizens directly to emergency services with one press.",
-  },
-  {
-    icon: MapPin,
+    icon: BrainCircuit,
     color: "text-violet-700",
     bg: "bg-violet-50",
-    title: "Incident Mapping",
+    title: "Adaptive Brightness",
     description:
-      "A live city-wide map tracks reported incidents, road hazards, and safety alerts to keep residents informed.",
+      "AI adjusts streetlight intensity based on real-time pedestrian density, weather, and ambient light conditions.",
   },
   {
-    icon: Users,
+    icon: Zap,
     color: "text-amber-700",
     bg: "bg-amber-50",
-    title: "Community Watch",
+    title: "Energy Savings",
     description:
-      "Citizens can report safety concerns via the app, building a collaborative network of community awareness.",
+      "Smart dimming and scheduling cuts street lighting energy consumption by up to 60% compared to conventional systems.",
+  },
+  {
+    icon: Moon,
+    color: "text-blue-700",
+    bg: "bg-blue-50",
+    title: "Light Pollution Reduction",
+    description:
+      "Directional LED fixtures and intelligent scheduling minimize light pollution, protecting the night sky and local wildlife.",
+  },
+  {
+    icon: Activity,
+    color: "text-green-700",
+    bg: "bg-green-50",
+    title: "Predictive Maintenance",
+    description:
+      "Sensors detect bulb degradation and faults before failure, triggering automated maintenance requests to reduce outages.",
   },
 ];
 
 const stats = [
-  { value: "94%", label: "Response Rate" },
-  { value: "< 4 min", label: "Avg. Emergency Response Time" },
-  { value: "320+", label: "Smart Cameras Deployed" },
-  { value: "12K+", label: "Citizens Connected" },
+  { value: "8,400+", label: "Smart Lights Installed" },
+  { value: "−60%", label: "Energy Consumption" },
+  { value: "99.2%", label: "Network Uptime" },
+  { value: "€2.1M", label: "Annual Savings" },
 ];
 
-export default function Safety() {
+export default function AIStreetlights() {
   return (
     <div className="bg-[#f8fafc] min-h-screen">
-      {/* Page Hero */}
       <section className="bg-white border-b border-slate-200">
         <Container className="py-14">
           <div className="flex items-center gap-4 mb-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
-              <Shield className="h-7 w-7 text-blue-700" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-violet-50">
+              <Lightbulb className="h-7 w-7 text-violet-700" />
             </div>
             <div>
               <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
                 Smart City Magdeburg
               </p>
               <h1 className="text-4xl font-bold text-[#061B46] tracking-tight">
-                Safety
+                AI Streetlights
               </h1>
             </div>
           </div>
           <p className="mt-2 max-w-2xl text-lg text-slate-600 leading-relaxed">
-            Building a safer Magdeburg for every resident — through smart
-            technology, real-time monitoring, and community cooperation.
+            Smart lighting for a smarter city — AI-driven streetlights that
+            save energy, enhance safety, and adapt to the city's rhythm.
           </p>
         </Container>
       </section>
 
-      {/* Stats Strip */}
       <section className="bg-[#061B46]">
         <Container>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
@@ -86,14 +84,13 @@ export default function Safety() {
         </Container>
       </section>
 
-      {/* Initiatives Grid */}
       <section className="py-16">
         <Container>
           <h2 className="text-2xl font-bold text-[#061B46] mb-8">
-            Safety Initiatives
+            Technology Features
           </h2>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {safetyInitiatives.map((item) => {
+            {streetlightFeatures.map((item) => {
               const Icon = item.icon;
               return (
                 <div
