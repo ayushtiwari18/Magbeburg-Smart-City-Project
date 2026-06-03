@@ -14,10 +14,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Magdeburg Smart City",
   description: "Smart city dashboard for Magdeburg with real-time data and insights.",
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,14 +29,12 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-         <div className="min-h-screen bg-[#f8fafc] text-[#061b46]">
-          <Navbar />
-
+      <body className="min-h-screen flex flex-col bg-[#f8fafc] text-[#061b46]">
+        <Navbar />
+        <main className="flex-1">
           {children}
-
-          <Footer />
-        </div>
+        </main>
+        <Footer />
       </body>
     </html>
   );

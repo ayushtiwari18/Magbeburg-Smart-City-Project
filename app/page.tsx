@@ -1,13 +1,12 @@
-import Hero from "@/components/home/Hero.jsx";
-import FeatureGrid from "@/components/home/FeatureGrid.jsx";
+import Hero from "@/components/home/Hero";
+import FeatureGrid from "@/components/home/FeatureGrid";
 
 export default function Home() {
   return (
-    <div >
+    <div>
       <main>
-       <Hero/>
-       <FeatureGrid/>
-
+        <Hero />
+        <FeatureGrid />
       </main>
     </div>
   );
