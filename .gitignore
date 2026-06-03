@@ -1,1 +1,10 @@
-/node_modules
+cat > .gitignore << 'EOF'
+node_modules
+.next
+.env
+.env.local
+dist
+build
+coverage
+*.log
+EOF

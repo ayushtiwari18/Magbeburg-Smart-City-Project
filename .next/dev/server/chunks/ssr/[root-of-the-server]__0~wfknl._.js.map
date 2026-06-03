@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///media/ayush5410/Ayush1/Downloads%20/Hackathon_2026-20260603T140513Z-3-001/Hackathon_2026/app/safety/page.tsx"],"sourcesContent":["\n\nexport default function Safety() {\n  return (\n    <div className=\"flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black\">\n      <main className=\"flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start\">\n        <h1 className=\"text-6xl font-bold text-center sm:text-left\">\n          Safety in the Smart City\n        </h1>\n        <p className=\"mt-4 text-2xl text-center sm:text-left\">\n          Learn about the safety measures and technologies implemented in our smart city initiatives.\n        </p>\n      </main>\n    </div>\n  );\n}"],"names":["Safety","className"],"mappings":";;;;;;AAEe,SAASA;IACtB,qBACE,8OAAC;QAAIC,WAAU;kBACb,cAAA,8OAAC;YAAKA,WAAU;;8BACd,8OAAC;oBAAGA,WAAU;8BAA8C;;;;;;8BAG5D,8OAAC;oBAAEA,WAAU;8BAAyC;;;;;;;;;;;;;;;;;AAM9D"}}]
-}
