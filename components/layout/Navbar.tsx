@@ -34,6 +34,7 @@ export default function Navbar() {
               alt="Magdeburg Logo"
               fill
               priority
+              sizes="176px"
               className="object-contain object-left"
             />
           </div>
