@@ -53,8 +53,12 @@ const features = [
 
 export default function FeatureGrid() {
   return (
-    <section className="relative z-20 -mt-20">
-      <div className="mx-auto max-w-[1440px] px-6 pb-12 sm:px-10 lg:px-20">
+    <section className="bg-[#f8fafc] py-12">
+      <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-20">
+        {/* Section label */}
+        <p className="mb-6 text-xs font-semibold uppercase tracking-widest text-slate-400">
+          Explore Smart City
+        </p>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
           {features.map((item) => {
             const Icon = item.icon;
@@ -81,22 +85,14 @@ export default function FeatureGrid() {
                 "
               >
                 <div>
-                  <div
-                    className={`mb-8 flex h-16 w-16 items-center justify-center rounded-full ${item.bg}`}
-                  >
+                  <div className={`mb-8 flex h-16 w-16 items-center justify-center rounded-full ${item.bg}`}>
                     <Icon className={`h-8 w-8 ${item.color}`} />
                   </div>
-                  <h3 className="text-xl font-semibold text-[#061B46]">
-                    {item.title}
-                  </h3>
-                  <p className="mt-4 text-base leading-8 text-slate-600">
-                    {item.description}
-                  </p>
+                  <h3 className="text-xl font-semibold text-[#061B46]">{item.title}</h3>
+                  <p className="mt-4 text-base leading-8 text-slate-600">{item.description}</p>
                 </div>
                 <div className="mt-8 flex justify-end">
-                  <ArrowRight
-                    className={`h-6 w-6 transition-transform duration-300 group-hover:translate-x-1 ${item.color}`}
-                  />
+                  <ArrowRight className={`h-6 w-6 transition-transform duration-300 group-hover:translate-x-1 ${item.color}`} />
                 </div>
               </Link>
             );
