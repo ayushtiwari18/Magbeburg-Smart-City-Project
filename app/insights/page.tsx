@@ -1,146 +1,237 @@
 "use client";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { BarChart3, TrendingUp, Users, Map, Database } from "lucide-react";
+import { useEffect, useState } from "react";
 import Container from "@/components/layout/Container";
+import { BarChart3, TrendingUp, Euro, Loader2 } from "lucide-react";
 
-function useCountUp(target: number, duration = 1800) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const started = useRef(false);
+const RAW = "https://raw.githubusercontent.com/SmartCityMagdeburg2026/Datasources/main/data";
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !started.current) {
-        started.current = true;
-        const start = performance.now();
-        const tick = (now: number) => {
-          const progress = Math.min((now - start) / duration, 1);
-          const ease = 1 - Math.pow(1 - progress, 3);
-          setCount(Math.round(ease * target));
-          if (progress < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      }
-    }, { threshold: 0.3 });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [target, duration]);
+type TaxRow = {
+  jahr: number;
+  gewerbesteuer: number | null;
+  "gemeindeanteil-an-der-einkommensteuer": number | null;
+  "gemeindeanteil-an-der-umsatzsteuer": number | null;
+  "grundsteuer-b-bis-2024": number | null;
+  "grundsteuer-b-ab-2025-wohngrundstuecke": number | null;
+  "grundsteuer-b-ab-2025-nichtwohngrundstuecke": number | null;
+  hundesteuer: number | null;
+  vergnuegungssteuer: number | null;
+};
 
-  return { count, ref };
+function fmt(v: number) {
+  if (v >= 1_000_000) return `€${(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 1_000) return `€${(v / 1_000).toFixed(0)}K`;
+  return `€${v.toFixed(0)}`;
 }
 
-const kpis = [
-  { label: "Daily Bus Rides",      value: 42800, suffix: "+",  color: "#16a34a",  bar: 78 },
-  { label: "Air Quality Index",    value: 42,    suffix: "",   color: "#0891b2",  bar: 42 },
-  { label: "Energy Saved (MWh)",   value: 1240,  suffix: "+",  color: "#7c3aed",  bar: 62 },
-  { label: "Active Smart Lights",  value: 8400,  suffix: "+",  color: "#d97706",  bar: 88 },
-  { label: "Incidents Resolved",   value: 318,   suffix: "",   color: "#2563eb",  bar: 91 },
-  { label: "New Trees Planted",    value: 5100,  suffix: "+",  color: "#16a34a",  bar: 51 },
-];
-
-function KpiCard({ label, value, suffix, color, bar }: typeof kpis[0]) {
-  const { count, ref } = useCountUp(value);
+function Bar({ value, max, color }: { value: number; max: number; color: string }) {
+  const pct = max > 0 ? (value / max) * 100 : 0;
   return (
-    <div ref={ref} className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">{label}</p>
-      <p className="text-4xl font-bold mb-4" style={{ color }}>
-        {count.toLocaleString()}{suffix}
-      </p>
-      <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-1000"
-          style={{ width: `${bar}%`, background: color }}
-        />
-      </div>
+    <div className="relative h-full w-full flex items-end">
+      <div
+        className="w-full rounded-t-md transition-all duration-500"
+        style={{ height: `${pct}%`, background: color, minHeight: 2 }}
+      />
     </div>
   );
 }
 
-const insightCategories = [
-  { icon: TrendingUp, color: "text-amber-700",  bg: "bg-amber-50",  title: "Live KPI Dashboard",  description: "Track Magdeburg's key performance indicators across safety, transport, climate, and energy in a single real-time view.",    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80", delay: "delay-100" },
-  { icon: Users,      color: "text-blue-700",   bg: "bg-blue-50",   title: "Citizen Feedback",     description: "Aggregated sentiment and satisfaction data from residents, collected via the smart city portal and public kiosks.",         image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80", delay: "delay-200" },
-  { icon: Map,        color: "text-green-700",  bg: "bg-green-50",  title: "District Heatmaps",    description: "Interactive maps showing neighbourhood-level data on noise, traffic, air quality, and public service usage.",              image: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=600&q=80", delay: "delay-300" },
-  { icon: Database,   color: "text-violet-700", bg: "bg-violet-50", title: "Open Data Portal",      description: "Anonymised city data made available to researchers, developers, and citizens to foster innovation and transparency.",     image: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=600&q=80", delay: "delay-400" },
-];
+export default function InsightsPage() {
+  const [rows, setRows] = useState<TaxRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [hover, setHover] = useState<TaxRow | null>(null);
 
-const stats = [
-  { value: "140+",   label: "Live Data Streams" },
-  { value: "3.8M",   label: "Data Points / Day" },
-  { value: "28",     label: "City Districts" },
-  { value: "99.7%",  label: "Dashboard Uptime" },
-];
+  useEffect(() => {
+    fetch(`${RAW}/steuereinnahmen/json/steuereinnahmen-2010-2025.json`)
+      .then(r => r.json())
+      .then(d => {
+        const sorted = [...d.rows].sort((a: TaxRow, b: TaxRow) => a.jahr - b.jahr);
+        setRows(sorted);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-export default function Insights() {
+  const totalByYear = rows.map(r => ({
+    jahr: r.jahr,
+    total: (
+      (r.gewerbesteuer ?? 0) +
+      (r["gemeindeanteil-an-der-einkommensteuer"] ?? 0) +
+      (r["gemeindeanteil-an-der-umsatzsteuer"] ?? 0) +
+      (r["grundsteuer-b-bis-2024"] ?? 0) +
+      (r["grundsteuer-b-ab-2025-wohngrundstuecke"] ?? 0) +
+      (r["grundsteuer-b-ab-2025-nichtwohngrundstuecke"] ?? 0)
+    ),
+    gewerbesteuer: r.gewerbesteuer ?? 0,
+    einkommensteuer: r["gemeindeanteil-an-der-einkommensteuer"] ?? 0,
+    umsatzsteuer: r["gemeindeanteil-an-der-umsatzsteuer"] ?? 0,
+  }));
+
+  const maxTotal = Math.max(...totalByYear.map(r => r.total), 1);
+  const latest = totalByYear[totalByYear.length - 1];
+  const prev = totalByYear[totalByYear.length - 2];
+  const growth = latest && prev ? ((latest.total - prev.total) / prev.total) * 100 : 0;
+
+  const COLORS = {
+    gewerbesteuer: "#2563eb",
+    einkommensteuer: "#16a34a",
+    umsatzsteuer: "#d97706",
+  };
+
   return (
     <div className="bg-[#f8fafc] min-h-screen">
-      <section className="relative h-[420px] sm:h-[480px]">
-        <Image src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&q=85" alt="City Insights" fill priority sizes="100vw" className="object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#061B46]/90 via-[#061B46]/60 to-transparent" />
-        <div className="absolute inset-0 flex items-center">
-          <Container>
-            <div className="max-w-xl animate-fade-up">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 backdrop-blur-sm">
-                <BarChart3 className="h-4 w-4 text-amber-300" />
-                <span className="text-sm font-medium text-amber-200 uppercase tracking-widest">Smart City Magdeburg</span>
-              </div>
-              <h1 className="text-5xl font-bold text-white tracking-tight sm:text-6xl">City Insights</h1>
-              <p className="mt-4 text-lg text-blue-100 leading-relaxed">Data-driven decisions for real impact — turning Magdeburg's city data into actionable intelligence.</p>
+      {/* Header */}
+      <section className="bg-white border-b border-slate-200">
+        <Container className="py-10">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-50">
+              <BarChart3 className="h-7 w-7 text-amber-700" />
             </div>
-          </Container>
-        </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">City Data · Live from Datasources</p>
+              <h1 className="text-3xl font-bold text-[#061B46]">City Insights</h1>
+            </div>
+          </div>
+        </Container>
       </section>
 
-      <section className="bg-[#061B46]">
-        <Container>
-          <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-white/10">
-            {stats.map((s, i) => (
-              <div key={s.label} className={`flex flex-col items-center justify-center py-8 px-4 text-center animate-fade-up delay-${(i + 1) * 100}`}>
-                <span className="text-3xl font-bold text-white">{s.value}</span>
-                <span className="mt-1 text-sm text-blue-300">{s.label}</span>
+      <Container className="py-10">
+        {loading ? (
+          <div className="flex items-center justify-center py-32">
+            <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {/* KPI strip */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              <div className="rounded-[20px] border border-slate-200 bg-white p-6 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Total Tax Revenue (2025)</p>
+                <p className="mt-2 text-3xl font-bold text-[#061B46] tabular-nums">{latest ? fmt(latest.total) : "—"}</p>
+                <p className="mt-1 text-sm text-slate-500">All sources combined</p>
               </div>
-            ))}
-          </div>
-        </Container>
-      </section>
+              <div className="rounded-[20px] border border-slate-200 bg-white p-6 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">YoY Growth</p>
+                <p className={`mt-2 text-3xl font-bold tabular-nums ${growth >= 0 ? "text-green-600" : "text-red-600"}`}>
+                  {growth >= 0 ? "+" : ""}{growth.toFixed(1)}%
+                </p>
+                <p className="mt-1 text-sm text-slate-500">vs. previous year</p>
+              </div>
+              <div className="rounded-[20px] border border-slate-200 bg-white p-6 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Gewerbesteuer (2025)</p>
+                <p className="mt-2 text-3xl font-bold text-[#061B46] tabular-nums">{latest ? fmt(latest.gewerbesteuer) : "—"}</p>
+                <p className="mt-1 text-sm text-slate-500">Business tax, largest share</p>
+              </div>
+            </div>
 
-      {/* Live KPI Dashboard */}
-      <section className="py-16 bg-white border-b border-slate-100">
-        <Container>
-          <h2 className="text-3xl font-bold text-[#061B46] mb-2 animate-fade-up">Live City Dashboard</h2>
-          <p className="text-slate-500 mb-10 animate-fade-up delay-100">Real-time metrics updating every 60 seconds across all smart city systems.</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-            {kpis.map((kpi) => <KpiCard key={kpi.label} {...kpi} />)}
-          </div>
-        </Container>
-      </section>
-
-      <section className="py-20">
-        <Container>
-          <h2 className="text-3xl font-bold text-[#061B46] mb-3 animate-fade-up">Insight Categories</h2>
-          <p className="text-slate-500 mb-12 animate-fade-up delay-100">Real-time intelligence powering smarter decisions across the city.</p>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {insightCategories.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.title} className={`group flex flex-col rounded-[28px] border border-slate-200 bg-white overflow-hidden shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl animate-scale-in ${item.delay}`}>
-                  <div className="relative h-44 w-full overflow-hidden">
-                    <Image src={item.image} alt={item.title} fill sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                  </div>
-                  <div className="p-6 flex flex-col flex-1">
-                    <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-full ${item.bg}`}><Icon className={`h-6 w-6 ${item.color}`} /></div>
-                    <h3 className="text-lg font-semibold text-[#061B46]">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-7 text-slate-500 flex-1">{item.description}</p>
-                  </div>
+            {/* Bar chart */}
+            <div className="rounded-[20px] border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-[#061B46]">Tax Revenue 2010–2025</h2>
+                  <p className="text-sm text-slate-500 mt-1">Annual city tax income breakdown — Source: Landeshauptstadt Magdeburg</p>
                 </div>
-              );
-            })}
+                <div className="flex flex-wrap gap-4">
+                  {Object.entries(COLORS).map(([k, c]) => (
+                    <span key={k} className="flex items-center gap-1.5 text-xs text-slate-600">
+                      <span className="h-3 w-3 rounded-sm flex-shrink-0" style={{ background: c }} />
+                      {k === "gewerbesteuer" ? "Business Tax" : k === "einkommensteuer" ? "Income Tax" : "Sales Tax"}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Chart area */}
+              <div className="relative">
+                {hover && (
+                  <div className="absolute top-0 right-0 z-10 rounded-[14px] border border-slate-200 bg-white shadow-lg p-4 text-xs space-y-1 min-w-[180px]">
+                    <p className="font-bold text-[#061B46] text-sm">{hover.jahr}</p>
+                    <p className="text-slate-600">Business: <span className="font-semibold tabular-nums">{fmt(hover.gewerbesteuer)}</span></p>
+                    <p className="text-slate-600">Income: <span className="font-semibold tabular-nums">{fmt(hover.einkommensteuer)}</span></p>
+                    <p className="text-slate-600">Sales: <span className="font-semibold tabular-nums">{fmt(hover.umsatzsteuer)}</span></p>
+                    <p className="font-bold text-[#061B46] border-t border-slate-100 pt-1 mt-1">Total: {fmt(hover.gewerbesteuer + hover.einkommensteuer + hover.umsatzsteuer)}</p>
+                  </div>
+                )}
+                <div className="flex items-end gap-1.5" style={{ height: 260 }}>
+                  {totalByYear.map(r => (
+                    <div
+                      key={r.jahr}
+                      className="flex-1 flex flex-col gap-0.5 h-full cursor-pointer"
+                      onMouseEnter={() => setHover(r)}
+                      onMouseLeave={() => setHover(null)}
+                    >
+                      {/* Stacked bars */}
+                      <div className="flex-1 flex flex-col justify-end gap-0.5">
+                        <div
+                          className="w-full rounded-t-md transition-all duration-500"
+                          style={{
+                            height: `${maxTotal > 0 ? (r.gewerbesteuer / maxTotal) * 100 : 0}%`,
+                            background: COLORS.gewerbesteuer,
+                            minHeight: 2,
+                          }}
+                        />
+                        <div
+                          className="w-full"
+                          style={{
+                            height: `${maxTotal > 0 ? (r.einkommensteuer / maxTotal) * 100 : 0}%`,
+                            background: COLORS.einkommensteuer,
+                            minHeight: 2,
+                          }}
+                        />
+                        <div
+                          className="w-full"
+                          style={{
+                            height: `${maxTotal > 0 ? (r.umsatzsteuer / maxTotal) * 100 : 0}%`,
+                            background: COLORS.umsatzsteuer,
+                            minHeight: 2,
+                          }}
+                        />
+                      </div>
+                      <p className="text-center text-[9px] text-slate-400 mt-1">{String(r.jahr).slice(2)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Raw table */}
+            <div className="rounded-[20px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100">
+                <h2 className="text-lg font-bold text-[#061B46]">Year-by-Year Breakdown</h2>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-slate-50 text-left">
+                      <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Year</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Business Tax</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Income Tax</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Sales Tax</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Property Tax B</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {[...totalByYear].reverse().map(r => (
+                      <tr key={r.jahr} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-6 py-3 font-bold text-[#061B46]">{r.jahr}</td>
+                        <td className="px-4 py-3 tabular-nums text-slate-700">{fmt(r.gewerbesteuer)}</td>
+                        <td className="px-4 py-3 tabular-nums text-slate-700">{fmt(r.einkommensteuer)}</td>
+                        <td className="px-4 py-3 tabular-nums text-slate-700">{fmt(r.umsatzsteuer)}</td>
+                        <td className="px-4 py-3 tabular-nums text-slate-700">
+                          {fmt(
+                            (rows.find(x => x.jahr === r.jahr)?.["grundsteuer-b-bis-2024"] ?? 0) +
+                            (rows.find(x => x.jahr === r.jahr)?.["grundsteuer-b-ab-2025-wohngrundstuecke"] ?? 0) +
+                            (rows.find(x => x.jahr === r.jahr)?.["grundsteuer-b-ab-2025-nichtwohngrundstuecke"] ?? 0)
+                          )}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums font-bold text-[#061B46] text-right">{fmt(r.total)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-        </Container>
-      </section>
+        )}
+      </Container>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import {
   Cloud,
   Lightbulb,
   BarChart3,
+  Home,
   ArrowRight,
 } from "lucide-react";
 
@@ -27,7 +28,7 @@ const features = [
   },
   {
     title: "Climate",
-    description: "A greener city for a better tomorrow.",
+    description: "75 years of temperature data visualised.",
     href: "/climate",
     icon: Cloud,
     color: "text-blue-700",
@@ -43,11 +44,19 @@ const features = [
   },
   {
     title: "City Insights",
-    description: "Data-driven decisions for real impact.",
+    description: "Tax revenue & city finances 2010–2025.",
     href: "/insights",
     icon: BarChart3,
     color: "text-amber-700",
     bg: "bg-amber-50",
+  },
+  {
+    title: "Rent Index",
+    description: "Net cold rent per district — Mietspiegel 2024.",
+    href: "/housing",
+    icon: Home,
+    color: "text-teal-700",
+    bg: "bg-teal-50",
   },
 ];
 
@@ -55,11 +64,10 @@ export default function FeatureGrid() {
   return (
     <section className="bg-[#f8fafc] py-12">
       <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-20">
-        {/* Section label */}
         <p className="mb-6 text-xs font-semibold uppercase tracking-widest text-slate-400">
           Explore Smart City
         </p>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {features.map((item) => {
             const Icon = item.icon;
             return (
@@ -67,21 +75,9 @@ export default function FeatureGrid() {
                 key={item.title}
                 href={item.href}
                 className="
-                  group
-                  flex
-                  min-h-[250px]
-                  flex-col
-                  justify-between
-                  rounded-[28px]
-                  border
-                  border-slate-200
-                  bg-white
-                  p-7
-                  shadow-sm
-                  transition-all
-                  duration-300
-                  hover:-translate-y-1
-                  hover:shadow-lg
+                  group flex min-h-[250px] flex-col justify-between
+                  rounded-[28px] border border-slate-200 bg-white p-7 shadow-sm
+                  transition-all duration-300 hover:-translate-y-1 hover:shadow-lg
                 "
               >
                 <div>
