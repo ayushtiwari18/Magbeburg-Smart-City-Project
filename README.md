@@ -16,11 +16,11 @@ Every page that shows real data fetches it directly at runtime — no data is bu
 | **Housing** | `/housing` | Net cold rent per m² by district, floor-area class, and year · 37 districts · 2012–2026 | [`data/mietspiegel-2024/nach-wohnflaeche.json`](https://github.com/SmartCityMagdeburg2026/Datasources/tree/main/data/mietspiegel-2024) · Mietspiegel Magdeburg 2024 |
 | **Insights** | `/insights` | Annual tax revenue breakdown (Gewerbesteuer, Einkommensteuer, Umsatzsteuer, Grundsteuer B) · 2010–2025 | [`data/steuereinnahmen/json/steuereinnahmen-2010-2025.json`](https://github.com/SmartCityMagdeburg2026/Datasources/tree/main/data/steuereinnahmen) · Landeshauptstadt Magdeburg |
 | **Map** | `/map` | Live weather (temperature, wind, condition), live air quality (PM10, PM2.5 µg/m³) from citizen sensors, tram stop locations | [Bright Sky / DWD API](https://brightsky.dev) · [Sensor.Community API](https://sensor.community) · [OpenStreetMap Overpass API](https://overpass-api.de) |
-| **Safety** | `/safety` | Simulated pedestrian zone occupancy (placeholder — real sensor endpoint not yet public) | `lib/pedestrian-zones.ts` |
-| **Transportation** | `/transportation` | Static content — no live GTFS/MVB API publicly available | N/A |
-| **AI Streetlights** | `/ai-streetlights` | Static content | N/A |
-| **Projects** | `/projects` | Static content | N/A |
-| **Events** | `/events` | Static content | N/A |
+| **Transportation** | `/transportation` | MVB annual ridership, vehicle fleet by fuel type (EV trend), cars per district, local transit network stats, Hauptbahnhof ticket sales | [`data/kiss-md/json/verkehr/`](https://github.com/SmartCityMagdeburg2026/Datasources/tree/main/data/kiss-md/json/verkehr) · KISS-MD / Landeshauptstadt Magdeburg |
+| **Safety** | `/safety` | Road accident totals, accidents by district (hotspot map), by hour of day (heatmap), by weekday, by cause | [`data/kiss-md/json/verkehr/`](https://github.com/SmartCityMagdeburg2026/Datasources/tree/main/data/kiss-md/json/verkehr) · KISS-MD / Landeshauptstadt Magdeburg |
+| **AI Streetlights** | `/ai-streetlights` | Road infrastructure stats (km, intersections); accident hotspots by district as proxy for smart-lighting prioritisation; streetlamp GPS positions | [`data/kiss-md/json/verkehr/strassen-und-verkehrsanlagen.json`](https://github.com/SmartCityMagdeburg2026/Datasources/tree/main/data/kiss-md/json/verkehr) · [OpenStreetMap Overpass API](https://overpass-api.de) (`highway=street_lamp`) |
+| **Projects** | `/projects` | Static content — no automated dataset available | Manually curated from [Digitale Modellregion Magdeburg](https://www.magdeburg.de) |
+| **Events** | `/events` | Static content | [GovData CKAN API](https://ckan.govdata.de/api/3/action/package_search?q=Magdeburg) (planned) |
 
 ---
 
@@ -45,7 +45,8 @@ No API key or authentication is required for any of these datasets.
 |---|---|---|
 | **Bright Sky** (DWD) | Current weather: temperature, wind speed, condition, precipitation | `https://api.brightsky.dev/current_weather?lat=52.1205&lon=11.6276` |
 | **Sensor.Community** | Air quality: PM10 and PM2.5 from citizen-operated sensors in a 10 km radius | `https://data.sensor.community/airrohr/v1/filter/area=52.1205,11.6276,10` |
-| **OpenStreetMap Overpass** | Tram stop locations across Magdeburg | `https://overpass-api.de/api/interpreter` with `railway=tram_stop` query |
+| **OpenStreetMap Overpass** | Tram stop locations; streetlamp GPS coordinates across Magdeburg | `https://overpass-api.de/api/interpreter` with `railway=tram_stop` or `highway=street_lamp` query |
+| **PEGELONLINE / WSV** | Live Elbe river water level + 7-day history at Magdeburg Strombrücke | `https://www.pegelonline.wsv.de/webservices/rest-api/v2/stations/MAGDEBURG-STROMBR%C3%9CCKE/W/currentmeasurement.json` |
 
 ---
 
@@ -87,9 +88,9 @@ app/
 ├── housing/          # Mietspiegel rent index by district
 ├── insights/         # Tax revenue bar chart (2010–2025)
 ├── map/              # Leaflet map + live weather + air quality + tram stops
-├── safety/           # Pedestrian zone occupancy (simulated)
-├── transportation/   # Smart transport overview (static)
-├── ai-streetlights/  # AI streetlight project info (static)
+├── safety/           # Road accidents by district / hour / weekday / cause
+├── transportation/   # MVB ridership, EV fleet trend, car ownership by district
+├── ai-streetlights/  # Smart streetlight context — road infra + accident hotspots
 ├── projects/         # City project listings (static)
 ├── events/           # City events (static)
 └── layout.tsx        # Root layout with nav
@@ -99,7 +100,7 @@ components/
 └── ui/               # Shared UI components
 
 lib/
-└── pedestrian-zones.ts  # Pedestrian data (simulated — replace with real endpoint)
+└── pedestrian-zones.ts  # Legacy placeholder — replace with real accident data
 ```
 
 ---
@@ -132,7 +133,32 @@ lib/
 | `gemeindeanteil-an-der-umsatzsteuer` | Municipal share of sales tax |
 | `grundsteuer-b-bis-2024` | Property tax B (up to 2024) |
 
-> **Note:** `null` values in the rent index indicate the sample size was too small for a statistically meaningful average and should be filtered out before display.
+### KISS-MD Verkehr files (Transportation & Safety)
+
+All files under `data/kiss-md/json/verkehr/` follow the standard KISS-MD envelope:
+
+```json
+{
+  "columns": [ { "id": "var1", "label": "...", "unit": "...", "role": "..." } ],
+  "rows":    [ { "var1": 2020, "var2": 12345, ... } ]
+}
+```
+
+| File | Page | Key columns |
+|---|---|---|
+| `befoerderte-personen-der-magdeburger-verkehrsbetriebe-gmbh-und-co-kg.json` | `/transportation` | Year, total passengers, tram, bus |
+| `fahrzeugbestand-nach-kraftstoff-und-schadstoffgruppen-plakette.json` | `/transportation` | Year, fuel type (Benzin / Diesel / Elektro / Hybrid), count |
+| `kraftfahrzeugbestand-aufgeschluesselt-nach-stadtteilen.json` | `/transportation` | Year, Stadtteil, total vehicles |
+| `innerstaedtischer-nahverkehr.json` | `/transportation` | Year, line count, km operated, capacity |
+| `vertriebskennziffern-des-magdeburger-hauptbahnhofs.json` | `/transportation` | Year, tickets sold, revenue |
+| `strassenverkehrsunfaelle-in-magdeburg-gesamt.json` | `/safety` | Year, total accidents, injured, killed |
+| `unfallgeschehen-in-der-stadt-magdeburg-nach-stadtteilen.json` | `/safety` | Year, Stadtteil, accident count |
+| `verkehrsunfaelle-aufgeteilt-nach-uhrzeiten.json` | `/safety` | Hour (0–23), accident count |
+| `verkehrsunfaelle-mit-sachschaden-nach-wochentagen.json` | `/safety` | Weekday, accident count |
+| `unfaelle-nach-ausgewaehlten-ursachen.json` | `/safety` | Year, cause (speeding / alcohol / distraction…), count |
+| `strassen-und-verkehrsanlagen.json` | `/ai-streetlights` | Total road km, intersection count, street categories |
+
+> **Note:** `null` values in the rent index indicate a sample size too small for a statistically meaningful average — filter before display. KISS-MD `null` values in numeric columns indicate missing/suppressed data for the same reason.
 
 ---
 
