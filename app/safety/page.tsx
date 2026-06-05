@@ -15,7 +15,7 @@ interface AccidentFeature {
     IstFuss?: number; IstRad?: number; IstPKW?: number; IstKrad?: number;
   };
 }
-interface GeoJSON { type: string; features: AccidentFeature[]; }
+interface AccidentGeoJSON { type: string; features: AccidentFeature[]; }
 
 interface KissRow { [key: string]: number | string | null; }
 interface KissData { columns: { id: string; label: string; unit?: string }[]; rows: KissRow[]; }
@@ -39,7 +39,7 @@ function Bar({ value, max, color }: { value: number; max: number; color: string 
 
 export default function Safety() {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [geo, setGeo] = useState<GeoJSON | null>(null);
+  const [geo, setGeo] = useState<AccidentGeoJSON | null>(null);
   const [yearData, setYearData] = useState<{ year: number; total: number; killed: number; injured: number }[]>([]);
   const [hourData, setHourData] = useState<{ hour: number; count: number }[]>([]);
   const [weekdayData, setWeekdayData] = useState<{ day: string; count: number }[]>([]);
@@ -56,7 +56,7 @@ export default function Safety() {
     const fetchAll = async () => {
       try {
         const [geoRes, yearRes, hourRes, weekRes, causeRes] = await Promise.allSettled([
-          fetch(`${RAW}/Unfaelle/Magdeburg_Unfallatlas.geojson`).then(r => r.json()) as Promise<GeoJSON>,
+          fetch(`${RAW}/Unfaelle/Magdeburg_Unfallatlas.geojson`).then(r => r.json()) as Promise<AccidentGeoJSON>,
           fetch(`${RAW}/kiss-md/json/verkehr/strassenverkehrsunfaelle-in-magdeburg-gesamt.json`).then(r => r.json()) as Promise<KissData>,
           fetch(`${RAW}/kiss-md/json/verkehr/verkehrsunfaelle-aufgeteilt-nach-uhrzeiten.json`).then(r => r.json()) as Promise<KissData>,
           fetch(`${RAW}/kiss-md/json/verkehr/verkehrsunfaelle-mit-sachschaden-nach-wochentagen.json`).then(r => r.json()) as Promise<KissData>,
@@ -141,7 +141,7 @@ export default function Safety() {
       }).addTo(map);
 
       const filtered = {
-        ...geo,
+        type: "FeatureCollection" as const,
         features: geo.features.filter(f => {
           if (activeYear && f.properties.UJAHR !== activeYear) return false;
           if (activeFilter === "cyclist" && !f.properties.IstRad) return false;
@@ -151,7 +151,7 @@ export default function Safety() {
         }),
       };
 
-      L.geoJSON(filtered as GeoJSON, {
+      L.geoJSON(filtered, {
         pointToLayer: (feature, latlng) => {
           const cat = (feature as AccidentFeature).properties.UKATEGORIE ?? 3;
           return L.circleMarker(latlng, {
