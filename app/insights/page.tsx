@@ -17,6 +17,15 @@ type TaxRow = {
   vergnuegungssteuer: number | null;
 };
 
+// Derived type used for the chart — all values are coerced to number (never null)
+type HoverRow = {
+  jahr: number;
+  total: number;
+  gewerbesteuer: number;
+  einkommensteuer: number;
+  umsatzsteuer: number;
+};
+
 function fmt(v: number) {
   if (v >= 1_000_000) return `€${(v / 1_000_000).toFixed(1)}M`;
   if (v >= 1_000) return `€${(v / 1_000).toFixed(0)}K`;
@@ -38,7 +47,7 @@ function Bar({ value, max, color }: { value: number; max: number; color: string 
 export default function InsightsPage() {
   const [rows, setRows] = useState<TaxRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [hover, setHover] = useState<TaxRow | null>(null);
+  const [hover, setHover] = useState<HoverRow | null>(null);
 
   useEffect(() => {
     fetch(`${RAW}/steuereinnahmen/json/steuereinnahmen-2010-2025.json`)
@@ -50,7 +59,7 @@ export default function InsightsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const totalByYear = rows.map(r => ({
+  const totalByYear: HoverRow[] = rows.map(r => ({
     jahr: r.jahr,
     total: (
       (r.gewerbesteuer ?? 0) +
