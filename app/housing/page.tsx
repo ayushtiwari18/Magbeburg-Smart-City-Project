@@ -5,11 +5,14 @@ import { Home, Loader2, ChevronUp, ChevronDown } from "lucide-react";
 
 const RAW = "https://raw.githubusercontent.com/SmartCityMagdeburg2026/Datasources/main/data";
 
+// Exact schema from data/mietspiegel-2024/README.en.md:
+// key: "nettokaltmiete_pro_qm" (NOT "nettokaltmiete_m2")
 type RentRow = {
   stadtteil: string;
-  wohnflaeche: string;
+  wohnflaechenklasse: string;
   year: number;
-  nettokaltmiete_m2: number | null;
+  nettokaltmiete_pro_qm: number | null;
+  stichprobengroesse: number | null;
 };
 
 type Summary = {
@@ -21,10 +24,10 @@ type Summary = {
 };
 
 function badge(avg: number) {
-  if (avg < 6)  return { label: "Affordable",   color: "bg-green-100 text-green-800" };
-  if (avg < 8)  return { label: "Moderate",     color: "bg-yellow-100 text-yellow-800" };
-  if (avg < 10) return { label: "Expensive",    color: "bg-orange-100 text-orange-800" };
-  return             { label: "Very Expensive", color: "bg-red-100 text-red-800" };
+  if (avg < 6)  return { label: "Affordable",    color: "bg-green-100 text-green-800" };
+  if (avg < 8)  return { label: "Moderate",      color: "bg-yellow-100 text-yellow-800" };
+  if (avg < 10) return { label: "Expensive",     color: "bg-orange-100 text-orange-800" };
+  return             { label: "Very Expensive",  color: "bg-red-100 text-red-800" };
 }
 
 export default function HousingPage() {
@@ -32,33 +35,46 @@ export default function HousingPage() {
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState<"asc" | "desc">("asc");
   const [search, setSearch] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${RAW}/mietspiegel-2024/nach-wohnflaeche.json`)
       .then(r => r.json())
       .then((d) => {
-        // Filter to latest year available
         const rows: RentRow[] = d.rows ?? [];
-        const maxYear = Math.max(...rows.map((r: RentRow) => r.year));
-        const latest = rows.filter((r: RentRow) => r.year === maxYear && r.nettokaltmiete_m2 !== null);
 
-        // Group by stadtteil
+        // Filter out null values (small sample sizes omitted by the source)
+        const valid = rows.filter(r => r.nettokaltmiete_pro_qm != null);
+        if (valid.length === 0) {
+          setError("No rent data available");
+          return;
+        }
+
+        // Use the latest year that has data
+        const maxYear = Math.max(...valid.map(r => r.year));
+        const latest = valid.filter(r => r.year === maxYear);
+
+        // Group by stadtteil and compute min/avg/max
         const map: Record<string, number[]> = {};
-        latest.forEach((r: RentRow) => {
+        latest.forEach(r => {
           if (!map[r.stadtteil]) map[r.stadtteil] = [];
-          map[r.stadtteil].push(r.nettokaltmiete_m2!);
+          map[r.stadtteil].push(r.nettokaltmiete_pro_qm!);
         });
 
-        const result: Summary[] = Object.entries(map).map(([stadtteil, vals]) => ({
-          stadtteil,
-          avg: vals.reduce((a, b) => a + b, 0) / vals.length,
-          min: Math.min(...vals),
-          max: Math.max(...vals),
-          category: badge(vals.reduce((a, b) => a + b, 0) / vals.length).label,
-        }));
+        const result: Summary[] = Object.entries(map).map(([stadtteil, vals]) => {
+          const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+          return {
+            stadtteil,
+            avg,
+            min: Math.min(...vals),
+            max: Math.max(...vals),
+            category: badge(avg).label,
+          };
+        });
 
         setSummaries(result);
       })
+      .catch(() => setError("Failed to load rent data"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -88,7 +104,9 @@ export default function HousingPage() {
             </div>
             <div className="text-right">
               <p className="text-xs text-slate-400 uppercase tracking-widest">City Avg. (€/m²)</p>
-              <p className="text-3xl font-bold text-[#061B46] tabular-nums">{avgCity > 0 ? `€${avgCity.toFixed(2)}` : "—"}</p>
+              <p className="text-3xl font-bold text-[#061B46] tabular-nums">
+                {avgCity > 0 ? `€${avgCity.toFixed(2)}` : "—"}
+              </p>
             </div>
           </div>
         </Container>
@@ -98,6 +116,10 @@ export default function HousingPage() {
         {loading ? (
           <div className="flex items-center justify-center py-32">
             <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center py-32">
+            <p className="text-slate-500">{error}</p>
           </div>
         ) : (
           <div className="space-y-6">
