@@ -3,11 +3,11 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
   Shield, AlertTriangle, PhoneCall, MapPin, Users, X, Send,
-  TrendingDown, Clock, Calendar, Activity, Flame, ChevronRight
+  TrendingDown, Activity, Flame, ChevronRight
 } from "lucide-react";
 import Container from "@/components/layout/Container";
 import {
-  AreaChart, Area, BarChart, Bar, ComposedChart, Line,
+  Area, BarChart, Bar, ComposedChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, Cell, RadialBarChart, RadialBar,
   PolarAngleAxis
@@ -44,8 +44,6 @@ const C = {
   border: "rgba(0,0,0,0.07)",
 };
 
-const WEEKDAY_LABELS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-
 function findColKey(columns: KissColumn[], ...tests: Array<(v: string) => boolean>): string | undefined {
   for (const test of tests) {
     const col = columns.find(c => test((c.key ?? "").toLowerCase()) || test((c.label ?? "").toLowerCase()));
@@ -54,7 +52,6 @@ function findColKey(columns: KissColumn[], ...tests: Array<(v: string) => boolea
   return undefined;
 }
 
-// ── Shared dark tooltip ─────────────────────────────────────────────────────
 type TTP = { active?: boolean; payload?: { name: string; value: number; color: string }[]; label?: string };
 const DarkTip = ({ active, payload, label }: TTP) => {
   if (!active || !payload?.length) return null;
@@ -76,7 +73,6 @@ const DarkTip = ({ active, payload, label }: TTP) => {
   );
 };
 
-// ── Animated counter ────────────────────────────────────────────────────────
 function AnimCounter({ target, duration = 1400 }: { target: number; duration?: number }) {
   const [val, setVal] = useState(0);
   useEffect(() => {
@@ -94,7 +90,6 @@ function AnimCounter({ target, duration = 1400 }: { target: number; duration?: n
   return <>{val.toLocaleString()}</>;
 }
 
-// ── Chart card wrapper ───────────────────────────────────────────────────────
 function ChartCard({ title, subtitle, height = 260, children, accent = C.blue }: {
   title: string; subtitle?: string; height?: number; children: React.ReactNode; accent?: string;
 }) {
@@ -104,8 +99,14 @@ function ChartCard({ title, subtitle, height = 260, children, accent = C.blue }:
       padding: "22px 24px", boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
       transition: "box-shadow 0.2s, transform 0.2s",
     }}
-      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = `0 8px 32px rgba(0,0,0,0.12), 0 0 0 2px ${accent}33`; (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 16px rgba(0,0,0,0.06)"; (e.currentTarget as HTMLDivElement).style.transform = "none"; }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = `0 8px 32px rgba(0,0,0,0.12), 0 0 0 2px ${accent}33`;
+        (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 16px rgba(0,0,0,0.06)";
+        (e.currentTarget as HTMLDivElement).style.transform = "none";
+      }}
     >
       <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: C.navy }}>{title}</p>
       {subtitle && <p style={{ margin: "2px 0 14px", fontSize: 11, color: C.muted }}>{subtitle}</p>}
@@ -115,7 +116,6 @@ function ChartCard({ title, subtitle, height = 260, children, accent = C.blue }:
   );
 }
 
-// ── KPI card ─────────────────────────────────────────────────────────────────
 function KpiCard({ icon: Icon, value, label, sub, color, delay = 0 }: {
   icon: React.ElementType; value: number; label: string; sub?: string; color: string; delay?: number;
 }) {
@@ -222,19 +222,15 @@ export default function Safety() {
   const cyclistInvolved    = features.filter(f => f.properties.IstRad === 1).length;
   const pedestrianInvolved = features.filter(f => f.properties.IstFuss === 1).length;
 
-  // severity pie data for radial bar
   const severityData = [
     { name: "Fatal",   value: fatalities, fill: C.red },
     { name: "Serious", value: serious,    fill: C.orange },
     { name: "Minor",   value: minor,      fill: C.amber },
   ];
 
-  // Heatmap: weekday × slot (just use count per weekday as intensity blocks)
-  const maxDay   = Math.max(...weekdayData.map(d => d.count), 1);
-  const maxHour  = Math.max(...hourData.map(d => d.count), 1);
-  const maxCause = Math.max(...causeData.map(d => d.count), 1);
+  const maxDay  = Math.max(...weekdayData.map(d => d.count), 1);
+  const maxHour = Math.max(...hourData.map(d => d.count), 1);
 
-  // hour buckets for heatmap grid (4 rows × 6 cols = 24h)
   const hourGrid = Array.from({ length: 24 }, (_, h) => {
     const found = hourData.find(d => d.hour === h);
     return { h, count: found?.count ?? 0 };
@@ -250,7 +246,7 @@ export default function Safety() {
   return (
     <div style={{ background: "#f1f5f9", minHeight: "100vh" }}>
 
-      {/* ── Hero ── */}
+      {/* Hero */}
       <section style={{ position: "relative", height: 480 }}>
         <Image src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1600&q=85" alt="Safety" fill priority sizes="100vw" style={{ objectFit: "cover" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(120deg,#061B46ee 0%,#061B46aa 50%,transparent 100%)" }} />
@@ -282,10 +278,10 @@ export default function Safety() {
         </div>
       </section>
 
-      {/* ── KPI strip ── */}
+      {/* KPI strip */}
       <div style={{ background: C.navy }}>
         <Container>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", borderTop: "none" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)" }}>
             {loading
               ? Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} style={{ padding: "28px 20px", textAlign: "center" }}>
@@ -294,10 +290,10 @@ export default function Safety() {
                 </div>
               ))
               : ([
-                { icon: AlertTriangle, value: totalAccidents,     label: "Accidents (2017–24)", sub: "Unfallatlas",       color: "#60a5fa" },
-                { icon: TrendingDown,  value: fatalities,          label: "Fatalities",          sub: "UKATEGORIE = 1",   color: "#f87171" },
-                { icon: Users,         value: cyclistInvolved,    label: "Cyclist Involved",    sub: "IstRad = 1",       color: "#34d399" },
-                { icon: MapPin,        value: pedestrianInvolved, label: "Pedestrians",         sub: "IstFuss = 1",      color: "#fbbf24" },
+                { icon: AlertTriangle, value: totalAccidents,     label: "Accidents (2017\u201324)", sub: "Unfallatlas",     color: "#60a5fa" },
+                { icon: TrendingDown,  value: fatalities,          label: "Fatalities",          sub: "UKATEGORIE = 1", color: "#f87171" },
+                { icon: Users,         value: cyclistInvolved,    label: "Cyclist Involved",    sub: "IstRad = 1",     color: "#34d399" },
+                { icon: MapPin,        value: pedestrianInvolved, label: "Pedestrians",         sub: "IstFuss = 1",    color: "#fbbf24" },
               ] as { icon: React.ElementType; value: number; label: string; sub: string; color: string }[]).map((s, i) => (
                 <div key={s.label} style={{ padding: "28px 20px", textAlign: "center", borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.08)" : "none", animation: `fadeUp 0.5s ${i * 0.1}s ease both` }}>
                   <s.icon size={18} color={s.color} style={{ marginBottom: 6 }} />
@@ -311,7 +307,7 @@ export default function Safety() {
         </Container>
       </div>
 
-      {/* ── Analytics Grid ── */}
+      {/* Analytics Grid */}
       <section style={{ padding: "48px 0" }}>
         <Container>
           <div style={{ marginBottom: 32 }}>
@@ -319,10 +315,9 @@ export default function Safety() {
             <p style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>Sources: Unfallatlas · KISS-MD Verkehr · Statistisches Amt Magdeburg</p>
           </div>
 
-          {/* Row 1: Yearly trend (wide) + Severity radial */}
+          {/* Row 1 */}
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 20, marginBottom: 20 }}>
-
-            <ChartCard title="🚗 Accident Trend 2010–2024" subtitle="Annual totals with fatalities overlay · KISS-MD Verkehr" height={280} accent={C.blue}>
+            <ChartCard title="Accident Trend 2010-2024" subtitle="Annual totals with fatalities overlay · KISS-MD Verkehr" height={280} accent={C.blue}>
               {loading ? <Skeleton /> : yearData.length === 0 ? <NoData /> : (
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={yearData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
@@ -349,7 +344,7 @@ export default function Safety() {
               )}
             </ChartCard>
 
-            <ChartCard title="☠️ Severity Breakdown" subtitle="Fatal · Serious · Minor — from GeoJSON" height={280} accent={C.red}>
+            <ChartCard title="Severity Breakdown" subtitle="Fatal · Serious · Minor — from GeoJSON" height={280} accent={C.red}>
               {loading ? <Skeleton /> : totalAccidents === 0 ? <NoData /> : (
                 <>
                   <ResponsiveContainer width="100%" height={200}>
@@ -372,10 +367,9 @@ export default function Safety() {
             </ChartCard>
           </div>
 
-          {/* Row 2: Hour chart + Weekday bars */}
+          {/* Row 2 */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
-
-            <ChartCard title="⏰ Accidents by Hour of Day" subtitle="KISS-MD — verkehrsunfaelle-aufgeteilt-nach-uhrzeiten" height={260} accent={C.violet}>
+            <ChartCard title="Accidents by Hour of Day" subtitle="KISS-MD — verkehrsunfaelle-aufgeteilt-nach-uhrzeiten" height={260} accent={C.violet}>
               {loading ? <Skeleton /> : hourData.length === 0 ? <NoData /> : (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={hourData} margin={{ top: 5, right: 8, left: -16, bottom: 0 }}>
@@ -387,7 +381,7 @@ export default function Safety() {
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                     <XAxis dataKey="hour" tick={{ fill: C.muted, fontSize: 10 }} tickLine={false}
-                      tickFormatter={h => h % 6 === 0 ? `${String(h).padStart(2,"0")}h` : ""} />
+                      tickFormatter={(h: number) => h % 6 === 0 ? `${String(h).padStart(2,"0")}h` : ""} />
                     <YAxis tick={{ fill: C.muted, fontSize: 10 }} tickLine={false} axisLine={false} />
                     <Tooltip content={<DarkTip />} />
                     <Bar dataKey="count" name="Accidents" fill="url(#gHour)" radius={[4, 4, 0, 0]} isAnimationActive animationDuration={1000} />
@@ -396,7 +390,7 @@ export default function Safety() {
               )}
             </ChartCard>
 
-            <ChartCard title="📅 Accidents by Weekday" subtitle="KISS-MD — sachschaden nach Wochentagen" height={260} accent={C.cyan}>
+            <ChartCard title="Accidents by Weekday" subtitle="KISS-MD — sachschaden nach Wochentagen" height={260} accent={C.cyan}>
               {loading ? <Skeleton /> : weekdayData.length === 0 ? <NoData /> : (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={weekdayData} layout="vertical" margin={{ top: 5, right: 16, left: 8, bottom: 0 }}>
@@ -421,10 +415,9 @@ export default function Safety() {
             </ChartCard>
           </div>
 
-          {/* Row 3: Causes (wide) + Hour heatmap grid */}
+          {/* Row 3 */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-
-            <ChartCard title="⚠️ Top Accident Causes" subtitle="KISS-MD — unfaelle-nach-ausgewaehlten-ursachen (latest year)" height={260} accent={C.red}>
+            <ChartCard title="Top Accident Causes" subtitle="KISS-MD — unfaelle-nach-ausgewaehlten-ursachen (latest year)" height={260} accent={C.red}>
               {loading ? <Skeleton /> : causeData.length === 0 ? <NoData /> : (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={causeData} layout="vertical" margin={{ top: 0, right: 16, left: 4, bottom: 0 }}>
@@ -433,15 +426,14 @@ export default function Safety() {
                     <YAxis type="category" dataKey="cause" tick={{ fill: C.muted, fontSize: 9.5 }} tickLine={false} axisLine={false} width={130} />
                     <Tooltip content={<DarkTip />} />
                     <Bar dataKey="count" name="Count" radius={[0, 4, 4, 0]} isAnimationActive animationDuration={1000}>
-                      {causeData.map((d, i) => <Cell key={i} fill={CAUSE_COLORS[i % CAUSE_COLORS.length]} />)}
+                      {causeData.map((_, i) => <Cell key={i} fill={CAUSE_COLORS[i % CAUSE_COLORS.length]} />)}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               )}
             </ChartCard>
 
-            {/* 24-hour heat grid */}
-            <ChartCard title="🔥 24-Hour Accident Intensity" subtitle="Heat grid — each cell = 1 hour of the day (0–23h)" height={260} accent={C.orange}>
+            <ChartCard title="24-Hour Accident Intensity" subtitle="Heat grid — each cell = 1 hour of the day (0-23h)" height={260} accent={C.orange}>
               {loading ? <Skeleton /> : hourData.length === 0 ? <NoData /> : (
                 <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", height: "100%", gap: 6 }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: 5 }}>
@@ -449,15 +441,13 @@ export default function Safety() {
                       const intensity = count / maxHour;
                       const bg = intensity > 0.75 ? C.red : intensity > 0.5 ? C.orange : intensity > 0.25 ? C.amber : "#e2e8f0";
                       return (
-                        <div key={h} title={`${String(h).padStart(2,"0")}:00 → ${count} accidents`}
+                        <div key={h} title={`${String(h).padStart(2,"0")}:00 - ${count} accidents`}
                           style={{
-                            aspectRatio: "1", borderRadius: 6,
-                            background: bg,
+                            aspectRatio: "1", borderRadius: 6, background: bg,
                             opacity: intensity < 0.05 ? 0.3 : 0.6 + intensity * 0.4,
                             display: "flex", alignItems: "center", justifyContent: "center",
                             fontSize: 9, fontWeight: 700, color: intensity > 0.3 ? "#fff" : C.muted,
-                            cursor: "default",
-                            transition: "transform 0.15s",
+                            cursor: "default", transition: "transform 0.15s",
                           }}
                           onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.15)")}
                           onMouseLeave={e => (e.currentTarget.style.transform = "none")}
@@ -487,24 +477,24 @@ export default function Safety() {
         </Container>
       </section>
 
-      {/* ── KPI Cards ── */}
+      {/* KPI Cards */}
       <section style={{ padding: "0 0 48px" }}>
         <Container>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: C.navy, marginBottom: 20 }}>Key Figures</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 16 }}>
             {loading ? Array.from({length:6}).map((_,i) => <SkeletonCard key={i} />) : [
-              { icon: Activity,      value: totalAccidents,     label: "Total Accidents",    sub: "2017–2024",    color: C.blue,   delay: 0   },
-              { icon: TrendingDown,  value: fatalities,          label: "Fatalities",         sub: "UKATEGORIE 1", color: C.red,    delay: 100 },
-              { icon: Flame,         value: serious,             label: "Serious Injuries",   sub: "UKATEGORIE 2", color: C.orange, delay: 200 },
-              { icon: AlertTriangle, value: minor,               label: "Minor Accidents",    sub: "UKATEGORIE 3", color: C.amber,  delay: 300 },
-              { icon: Users,         value: cyclistInvolved,    label: "Cyclists Involved",  sub: "IstRad = 1",   color: C.green,  delay: 400 },
-              { icon: MapPin,        value: pedestrianInvolved, label: "Pedestrians Involved",sub: "IstFuss = 1",  color: C.violet, delay: 500 },
+              { icon: Activity,      value: totalAccidents,     label: "Total Accidents",      sub: "2017-2024",    color: C.blue,   delay: 0   },
+              { icon: TrendingDown,  value: fatalities,          label: "Fatalities",           sub: "UKATEGORIE 1", color: C.red,    delay: 100 },
+              { icon: Flame,         value: serious,             label: "Serious Injuries",     sub: "UKATEGORIE 2", color: C.orange, delay: 200 },
+              { icon: AlertTriangle, value: minor,               label: "Minor Accidents",      sub: "UKATEGORIE 3", color: C.amber,  delay: 300 },
+              { icon: Users,         value: cyclistInvolved,    label: "Cyclists Involved",    sub: "IstRad = 1",   color: C.green,  delay: 400 },
+              { icon: MapPin,        value: pedestrianInvolved, label: "Pedestrians Involved", sub: "IstFuss = 1",  color: C.violet, delay: 500 },
             ].map(k => <KpiCard key={k.label} icon={k.icon} value={k.value} label={k.label} sub={k.sub} color={k.color} delay={k.delay} />)}
           </div>
         </Container>
       </section>
 
-      {/* ── Initiatives ── */}
+      {/* Initiatives */}
       <section style={{ paddingBottom: 80 }}>
         <Container>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: C.navy, marginBottom: 8 }}>Safety Initiatives</h2>
@@ -521,8 +511,14 @@ export default function Safety() {
                 border: `1px solid ${C.border}`, boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
                 transition: "transform 0.25s, box-shadow 0.25s",
               }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-6px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 16px 40px rgba(0,0,0,0.12)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = "none"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 16px rgba(0,0,0,0.06)"; }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(-6px)";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 16px 40px rgba(0,0,0,0.12)";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLDivElement).style.transform = "none";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 16px rgba(0,0,0,0.06)";
+                }}
               >
                 <div style={{ position: "relative", height: 180 }}>
                   <Image src={item.img} alt={item.title} fill sizes="400px" style={{ objectFit: "cover" }} />
@@ -544,23 +540,21 @@ export default function Safety() {
         </Container>
       </section>
 
-      {/* ── FAB ── */}
+      {/* FAB */}
       <button onClick={() => setModalOpen(true)} style={{
         position: "fixed", bottom: 32, right: 32, zIndex: 40,
         display: "flex", alignItems: "center", gap: 8,
-        background: C.navy, borderRadius: 999,
-        padding: "14px 22px", fontSize: 13, fontWeight: 700,
-        color: "#fff", border: "none", cursor: "pointer",
-        boxShadow: "0 8px 32px rgba(6,27,70,0.4)",
-        transition: "transform 0.15s, box-shadow 0.15s",
+        background: C.navy, borderRadius: 999, padding: "14px 22px",
+        fontSize: 13, fontWeight: 700, color: "#fff", border: "none", cursor: "pointer",
+        boxShadow: "0 8px 32px rgba(6,27,70,0.4)", transition: "transform 0.15s",
       }}
-        onMouseEnter={e => { (e.currentTarget.style.transform = "scale(1.06)"; e.currentTarget.style.background = C.blue); }}
-        onMouseLeave={e => { (e.currentTarget.style.transform = "none"; e.currentTarget.style.background = C.navy); }}
+        onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.06)"; e.currentTarget.style.background = C.blue; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.background = C.navy; }}
       >
         <Send size={15} /> Report Issue
       </button>
 
-      {/* ── Modal ── */}
+      {/* Modal */}
       {modalOpen && (
         <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)", animation: "fadeIn 0.2s ease" }}>
           <div style={{ width: "100%", maxWidth: 440, background: "#fff", borderRadius: 28, boxShadow: "0 24px 64px rgba(0,0,0,0.25)", animation: "scaleIn 0.25s ease" }}>
@@ -571,13 +565,15 @@ export default function Safety() {
                     <div style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>Report a Safety Issue</div>
                     <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Help us keep Magdeburg safe</div>
                   </div>
-                  <button onClick={() => setModalOpen(false)} style={{ width: 36, height: 36, borderRadius: "50%", border: "none", background: "#f1f5f9", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={16} /></button>
+                  <button onClick={() => setModalOpen(false)} style={{ width: 36, height: 36, borderRadius: "50%", border: "none", background: "#f1f5f9", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <X size={16} />
+                  </button>
                 </div>
                 <form onSubmit={handleSubmit} style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
                   {([
-                    { label: "Your Name",   key: "name",        placeholder: "Max Mustermann",          type: "input" },
-                    { label: "Location",    key: "location",    placeholder: "e.g. Breiter Weg, Altstadt", type: "input" },
-                  ] as { label: string; key: "name" | "location"; placeholder: string; type: string }[]).map(f => (
+                    { label: "Your Name", key: "name",     placeholder: "Max Mustermann" },
+                    { label: "Location",  key: "location", placeholder: "e.g. Breiter Weg, Altstadt" },
+                  ] as { label: string; key: "name" | "location"; placeholder: string }[]).map(f => (
                     <div key={f.key}>
                       <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>{f.label}</label>
                       <input required value={form[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })} placeholder={f.placeholder}
@@ -604,7 +600,7 @@ export default function Safety() {
               </>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 56, textAlign: "center" }}>
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, marginBottom: 16 }}>✅</div>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, marginBottom: 16 }}>&#x2705;</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: C.navy }}>Report Submitted!</div>
                 <p style={{ fontSize: 13, color: C.muted, marginTop: 8 }}>Thank you, {form.name}. Our team will review your report shortly.</p>
               </div>
@@ -627,7 +623,7 @@ function Skeleton() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10, height: "100%", justifyContent: "flex-end" }}>
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} style={{ height: 16, background: "#f1f5f9", borderRadius: 6, animation: "pulse 1.5s infinite", width: `${60 + Math.random() * 40}%` }} />
+        <div key={i} style={{ height: 16, background: "#f1f5f9", borderRadius: 6, animation: "pulse 1.5s infinite" }} />
       ))}
     </div>
   );
