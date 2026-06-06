@@ -295,6 +295,8 @@ const TABS = [
   {id:"rail",    label:"🚆 Rail",       icon:Activity},
 ];
 
+const FADE_IN: React.CSSProperties = { animation: "fadeIn 0.35s ease" };
+
 export default function Transportation() {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<unknown>(null);
@@ -577,208 +579,218 @@ export default function Transportation() {
 
       {/* ── FLEET TAB */}
       {activeTab==="fleet" && mounted && (
-        <Container className="py-8" style={{animation:"fadeIn 0.35s ease"}}>
-          <SectionTitle icon={Car} title="Vehicle Fleet — Magdeburg 2011–2025" subtitle="Source: Kraftfahrzeugbestand | Steady growth to 144,339 registered vehicles" color={C.blue}/>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-            <StatCard icon={Car}        value={latest.total.toLocaleString()} label="Total Vehicles" sub="2025" color={C.blue} animate/>
-            <StatCard icon={Car}        value={latest.cars.toLocaleString()}  label="Passenger Cars" sub="2025" color={C.green} animate/>
-            <StatCard icon={TrendingUp} value={latest.motorcycles.toLocaleString()} label="Motorcycles" sub="2025" color={C.orange} animate/>
-            <StatCard icon={Activity}   value={latest.trucks.toLocaleString()} label="Trucks/LGV" sub="2025" color={C.purple} animate/>
-            <StatCard icon={Navigation} value="587" label="Per 1,000 Residents" sub="motorisation rate 2025" color={C.yellow} animate/>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-            <ChartCard title="🚗 Total Vehicle Fleet Growth" height={260}>
+        <div style={FADE_IN}>
+          <Container className="py-8">
+            <SectionTitle icon={Car} title="Vehicle Fleet — Magdeburg 2011–2025" subtitle="Source: Kraftfahrzeugbestand | Steady growth to 144,339 registered vehicles" color={C.blue}/>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+              <StatCard icon={Car}        value={latest.total.toLocaleString()} label="Total Vehicles" sub="2025" color={C.blue} animate/>
+              <StatCard icon={Car}        value={latest.cars.toLocaleString()}  label="Passenger Cars" sub="2025" color={C.green} animate/>
+              <StatCard icon={TrendingUp} value={latest.motorcycles.toLocaleString()} label="Motorcycles" sub="2025" color={C.orange} animate/>
+              <StatCard icon={Activity}   value={latest.trucks.toLocaleString()} label="Trucks/LGV" sub="2025" color={C.purple} animate/>
+              <StatCard icon={Navigation} value="587" label="Per 1,000 Residents" sub="motorisation rate 2025" color={C.yellow} animate/>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+              <ChartCard title="🚗 Total Vehicle Fleet Growth" height={260}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={FLEET_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                    <defs><linearGradient id="gTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue} stopOpacity={0.15}/><stop offset="95%" stopColor={C.blue} stopOpacity={0}/></linearGradient></defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
+                    <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                    <YAxis tickFormatter={v=>Math.round(v/1000)+"k"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                    <Tooltip content={<LightTooltip/>}/>
+                    <Area type="monotone" dataKey="total" name="Total Fleet" stroke={C.blue} strokeWidth={2.5} fill="url(#gTotal)" isAnimationActive animationDuration={1200}/>
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartCard>
+              <ChartCard title="🔢 Fleet by Type" height={260}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={FLEET_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                    <defs>
+                      {[["gCars",C.blue],["gTrucks",C.green],["gMoto",C.orange]].map(([id,c])=>(
+                        <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={c} stopOpacity={0.15}/><stop offset="95%" stopColor={c} stopOpacity={0}/></linearGradient>
+                      ))}
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
+                    <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                    <YAxis tickFormatter={v=>Math.round(v/1000)+"k"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                    <Tooltip content={<LightTooltip/>}/>
+                    <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
+                    <Area type="monotone" dataKey="cars" name="Cars" stroke={C.blue} strokeWidth={2} fill="url(#gCars)" isAnimationActive animationDuration={1000}/>
+                    <Area type="monotone" dataKey="trucks" name="Trucks" stroke={C.green} strokeWidth={2} fill="url(#gTrucks)" isAnimationActive animationDuration={1100}/>
+                    <Area type="monotone" dataKey="motorcycles" name="Motorcycles" stroke={C.orange} strokeWidth={2} fill="url(#gMoto)" isAnimationActive animationDuration={1200}/>
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+            <ChartCard title="🏙️ Motorisation Rate — Vehicles per 1,000 Residents" height={220}>
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={FLEET_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                  <defs><linearGradient id="gTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue} stopOpacity={0.15}/><stop offset="95%" stopColor={C.blue} stopOpacity={0}/></linearGradient></defs>
+                <LineChart data={MOTORISATION_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
                   <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                  <YAxis tickFormatter={v=>Math.round(v/1000)+"k"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                  <Tooltip content={<LightTooltip/>}/>
-                  <Area type="monotone" dataKey="total" name="Total Fleet" stroke={C.blue} strokeWidth={2.5} fill="url(#gTotal)" isAnimationActive animationDuration={1200}/>
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartCard>
-            <ChartCard title="🔢 Fleet by Type" height={260}>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={FLEET_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                  <defs>
-                    {[["gCars",C.blue],["gTrucks",C.green],["gMoto",C.orange]].map(([id,c])=>(
-                      <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={c} stopOpacity={0.15}/><stop offset="95%" stopColor={c} stopOpacity={0}/></linearGradient>
-                    ))}
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
-                  <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                  <YAxis tickFormatter={v=>Math.round(v/1000)+"k"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                  <YAxis domain={[480,610]} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
                   <Tooltip content={<LightTooltip/>}/>
                   <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
-                  <Area type="monotone" dataKey="cars" name="Cars" stroke={C.blue} strokeWidth={2} fill="url(#gCars)" isAnimationActive animationDuration={1000}/>
-                  <Area type="monotone" dataKey="trucks" name="Trucks" stroke={C.green} strokeWidth={2} fill="url(#gTrucks)" isAnimationActive animationDuration={1100}/>
-                  <Area type="monotone" dataKey="motorcycles" name="Motorcycles" stroke={C.orange} strokeWidth={2} fill="url(#gMoto)" isAnimationActive animationDuration={1200}/>
-                </AreaChart>
+                  <Line type="monotone" dataKey="totalPer1k" name="Total/1k" stroke={C.purple} strokeWidth={2.5} dot={{r:3,fill:C.purple}} isAnimationActive animationDuration={1200}/>
+                  <Line type="monotone" dataKey="carsPer1k" name="Cars/1k" stroke={C.blue} strokeWidth={2.5} dot={{r:3,fill:C.blue}} isAnimationActive animationDuration={1000}/>
+                </LineChart>
               </ResponsiveContainer>
             </ChartCard>
-          </div>
-          <ChartCard title="🏙️ Motorisation Rate — Vehicles per 1,000 Residents" height={220}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={MOTORISATION_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
-                <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                <YAxis domain={[480,610]} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                <Tooltip content={<LightTooltip/>}/>
-                <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
-                <Line type="monotone" dataKey="totalPer1k" name="Total/1k" stroke={C.purple} strokeWidth={2.5} dot={{r:3,fill:C.purple}} isAnimationActive animationDuration={1200}/>
-                <Line type="monotone" dataKey="carsPer1k" name="Cars/1k" stroke={C.blue} strokeWidth={2.5} dot={{r:3,fill:C.blue}} isAnimationActive animationDuration={1000}/>
-              </LineChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </Container>
+          </Container>
+        </div>
       )}
 
       {/* ── GREEN TAB */}
       {activeTab==="green" && mounted && (
-        <Container className="py-8" style={{animation:"fadeIn 0.35s ease"}}>
-          <SectionTitle icon={Leaf} title="Green & Alternative Fuel Vehicles" subtitle="Source: Fahrzeugbestand Kraftstoff | EV and hybrid registrations surging since 2023" color={C.green}/>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-            <StatCard icon={Zap}    value="2,679" label="Pure Electric" sub="2024 city total" color={C.yellow} animate/>
-            <StatCard icon={Leaf}   value="8,001" label="Full Hybrid" sub="2024 city total" color={C.green} animate/>
-            <StatCard icon={Leaf}   value="2,425" label="Mild Hybrid" sub="2024 city total" color={C.teal} animate/>
-            <StatCard icon={TrendingUp} value="63.0%" label="Gasoline share" sub="118k total 2024" color={C.blue} animate/>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <ChartCard title="⛽ Fuel Mix — Magdeburg 2024" height={300}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={FUEL_DATA} cx="50%" cy="50%" innerRadius="52%" outerRadius="75%" paddingAngle={3} dataKey="value" nameKey="name" isAnimationActive animationDuration={1000} animationBegin={200}>
-                    {FUEL_DATA.map((entry,i)=>(<Cell key={i} fill={entry.color} stroke="#f8fafc" strokeWidth={2}/>))}
-                  </Pie>
-                  <Tooltip content={<LightTooltip/>}/>
-                  <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartCard>
-            <ChartCard title="🔋 Green Vehicle Registrations 2023–2025" height={300}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={GREEN_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
-                  <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                  <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                  <Tooltip content={<LightTooltip/>}/>
-                  <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
-                  <Bar dataKey="electric" name="Pure EV" fill={C.yellow} radius={[4,4,0,0]} isAnimationActive animationDuration={800}/>
-                  <Bar dataKey="mildHybrid" name="Mild Hybrid" fill={C.teal} radius={[4,4,0,0]} isAnimationActive animationDuration={900}/>
-                  <Bar dataKey="fullHybrid" name="Full Hybrid" fill={C.green} radius={[4,4,0,0]} isAnimationActive animationDuration={1000}/>
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartCard>
-          </div>
-        </Container>
+        <div style={FADE_IN}>
+          <Container className="py-8">
+            <SectionTitle icon={Leaf} title="Green & Alternative Fuel Vehicles" subtitle="Source: Fahrzeugbestand Kraftstoff | EV and hybrid registrations surging since 2023" color={C.green}/>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+              <StatCard icon={Zap}    value="2,679" label="Pure Electric" sub="2024 city total" color={C.yellow} animate/>
+              <StatCard icon={Leaf}   value="8,001" label="Full Hybrid" sub="2024 city total" color={C.green} animate/>
+              <StatCard icon={Leaf}   value="2,425" label="Mild Hybrid" sub="2024 city total" color={C.teal} animate/>
+              <StatCard icon={TrendingUp} value="63.0%" label="Gasoline share" sub="118k total 2024" color={C.blue} animate/>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <ChartCard title="⛽ Fuel Mix — Magdeburg 2024" height={300}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={FUEL_DATA} cx="50%" cy="50%" innerRadius="52%" outerRadius="75%" paddingAngle={3} dataKey="value" nameKey="name" isAnimationActive animationDuration={1000} animationBegin={200}>
+                      {FUEL_DATA.map((entry,i)=>(<Cell key={i} fill={entry.color} stroke="#f8fafc" strokeWidth={2}/>))}
+                    </Pie>
+                    <Tooltip content={<LightTooltip/>}/>
+                    <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+              <ChartCard title="🔋 Green Vehicle Registrations 2023–2025" height={300}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={GREEN_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
+                    <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                    <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                    <Tooltip content={<LightTooltip/>}/>
+                    <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
+                    <Bar dataKey="electric" name="Pure EV" fill={C.yellow} radius={[4,4,0,0]} isAnimationActive animationDuration={800}/>
+                    <Bar dataKey="mildHybrid" name="Mild Hybrid" fill={C.teal} radius={[4,4,0,0]} isAnimationActive animationDuration={900}/>
+                    <Bar dataKey="fullHybrid" name="Full Hybrid" fill={C.green} radius={[4,4,0,0]} isAnimationActive animationDuration={1000}/>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          </Container>
+        </div>
       )}
 
       {/* ── LICENCES TAB */}
       {activeTab==="licences" && mounted && (
-        <Container className="py-8" style={{animation:"fadeIn 0.35s ease"}}>
-          <SectionTitle icon={BarChart2} title="Driver's Licences Issued — Magdeburg" subtitle="Source: Führerscheine | Post-COVID surge: 12,527 in 2022 vs 5,843 in 2020" color={C.purple}/>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-            <StatCard icon={BarChart2} value="12,770" label="Total Licences" sub="2025" color={C.purple} animate/>
-            <StatCard icon={Car}       value="2,820"  label="Car (Class B)" sub="2025" color={C.blue} animate/>
-            <StatCard icon={Activity}  value="1,163"  label="Motorcycles" sub="2025" color={C.orange} animate/>
-            <StatCard icon={TrendingUp} value="+119%" label="Growth 2020→2022" sub="COVID rebound" color={C.green} animate/>
-          </div>
-          <ChartCard title="🪪 Licences Issued per Year — by Category" height={320}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={LICENCE_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
-                <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                <Tooltip content={<LightTooltip/>}/>
-                <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
-                <Bar dataKey="car" name="Car (B)" fill={C.blue} stackId="a" isAnimationActive animationDuration={800}/>
-                <Bar dataKey="moto" name="Motorcycle" fill={C.orange} stackId="a" isAnimationActive animationDuration={900}/>
-                <Bar dataKey="truck" name="Truck/HGV" fill={C.green} stackId="a" radius={[4,4,0,0]} isAnimationActive animationDuration={1000}/>
-                <Line type="monotone" dataKey="total" name="Total" stroke={C.purple} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1200}/>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </Container>
-      )}
-
-      {/* ── BOATS TAB */}
-      {activeTab==="boats" && mounted && (
-        <Container className="py-8" style={{animation:"fadeIn 0.35s ease"}}>
-          <SectionTitle icon={Anchor} title="Weiße Flotte — River Transport 2017–2024" subtitle="Source: Weisse Flotte GmbH | Strong rebound to 41,525 passengers in 2024" color={C.teal}/>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-            <StatCard icon={Users}      value="41,525" label="Passengers 2024" sub="+24% vs 2023" color={C.teal} animate/>
-            <StatCard icon={Navigation} value="36,501" label="Total Routes (km)" sub="2024" color={C.blue} animate/>
-            <StatCard icon={Activity}   value="24,816" label="Line Service (km)" sub="2024" color={C.green} animate/>
-            <StatCard icon={TrendingUp} value="809"    label="Service Events" sub="2024 (gastronomy)" color={C.yellow} animate/>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <ChartCard title="⛵ Passengers & Route-km by Year" height={280}>
+        <div style={FADE_IN}>
+          <Container className="py-8">
+            <SectionTitle icon={BarChart2} title="Driver's Licences Issued — Magdeburg" subtitle="Source: Führerscheine | Post-COVID surge: 12,527 in 2022 vs 5,843 in 2020" color={C.purple}/>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+              <StatCard icon={BarChart2} value="12,770" label="Total Licences" sub="2025" color={C.purple} animate/>
+              <StatCard icon={Car}       value="2,820"  label="Car (Class B)" sub="2025" color={C.blue} animate/>
+              <StatCard icon={Activity}  value="1,163"  label="Motorcycles" sub="2025" color={C.orange} animate/>
+              <StatCard icon={TrendingUp} value="+119%" label="Growth 2020→2022" sub="COVID rebound" color={C.green} animate/>
+            </div>
+            <ChartCard title="🪪 Licences Issued per Year — by Category" height={320}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={BOAT_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
-                  <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                  <YAxis yAxisId="left" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>Math.round(v/1000)+"k"}/>
-                  <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>Math.round(v/1000)+"k"}/>
-                  <Tooltip content={<LightTooltip/>}/>
-                  <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
-                  <Bar yAxisId="left" dataKey="passengers" name="Passengers" fill={C.teal} radius={[4,4,0,0]} isAnimationActive animationDuration={900}/>
-                  <Line yAxisId="right" type="monotone" dataKey="totalKm" name="Route-km" stroke={C.orange} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1100}/>
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartCard>
-            <ChartCard title="⛵ Line Service vs Total Routes (km)" height={280}>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={BOAT_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                  <defs>
-                    <linearGradient id="gLine" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue} stopOpacity={0.15}/><stop offset="95%" stopColor={C.blue} stopOpacity={0}/></linearGradient>
-                    <linearGradient id="gCharter" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.orange} stopOpacity={0.15}/><stop offset="95%" stopColor={C.orange} stopOpacity={0}/></linearGradient>
-                  </defs>
+                <BarChart data={LICENCE_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
                   <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
                   <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
                   <Tooltip content={<LightTooltip/>}/>
                   <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
-                  <Area type="monotone" dataKey="lineKm" name="Line Service" stroke={C.blue} strokeWidth={2} fill="url(#gLine)" isAnimationActive animationDuration={900}/>
-                  <Area type="monotone" dataKey="totalKm" name="Total Routes" stroke={C.orange} strokeWidth={2} fill="url(#gCharter)" isAnimationActive animationDuration={1100}/>
-                </AreaChart>
+                  <Bar dataKey="car" name="Car (B)" fill={C.blue} stackId="a" isAnimationActive animationDuration={800}/>
+                  <Bar dataKey="moto" name="Motorcycle" fill={C.orange} stackId="a" isAnimationActive animationDuration={900}/>
+                  <Bar dataKey="truck" name="Truck/HGV" fill={C.green} stackId="a" radius={[4,4,0,0]} isAnimationActive animationDuration={1000}/>
+                  <Line type="monotone" dataKey="total" name="Total" stroke={C.purple} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1200}/>
+                </BarChart>
               </ResponsiveContainer>
             </ChartCard>
-          </div>
-        </Container>
+          </Container>
+        </div>
+      )}
+
+      {/* ── BOATS TAB */}
+      {activeTab==="boats" && mounted && (
+        <div style={FADE_IN}>
+          <Container className="py-8">
+            <SectionTitle icon={Anchor} title="Weiße Flotte — River Transport 2017–2024" subtitle="Source: Weisse Flotte GmbH | Strong rebound to 41,525 passengers in 2024" color={C.teal}/>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+              <StatCard icon={Users}      value="41,525" label="Passengers 2024" sub="+24% vs 2023" color={C.teal} animate/>
+              <StatCard icon={Navigation} value="36,501" label="Total Routes (km)" sub="2024" color={C.blue} animate/>
+              <StatCard icon={Activity}   value="24,816" label="Line Service (km)" sub="2024" color={C.green} animate/>
+              <StatCard icon={TrendingUp} value="809"    label="Service Events" sub="2024 (gastronomy)" color={C.yellow} animate/>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <ChartCard title="⛵ Passengers & Route-km by Year" height={280}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={BOAT_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
+                    <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                    <YAxis yAxisId="left" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>Math.round(v/1000)+"k"}/>
+                    <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>Math.round(v/1000)+"k"}/>
+                    <Tooltip content={<LightTooltip/>}/>
+                    <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
+                    <Bar yAxisId="left" dataKey="passengers" name="Passengers" fill={C.teal} radius={[4,4,0,0]} isAnimationActive animationDuration={900}/>
+                    <Line yAxisId="right" type="monotone" dataKey="totalKm" name="Route-km" stroke={C.orange} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1100}/>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+              <ChartCard title="⛵ Line Service vs Total Routes (km)" height={280}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={BOAT_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                    <defs>
+                      <linearGradient id="gLine" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue} stopOpacity={0.15}/><stop offset="95%" stopColor={C.blue} stopOpacity={0}/></linearGradient>
+                      <linearGradient id="gCharter" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.orange} stopOpacity={0.15}/><stop offset="95%" stopColor={C.orange} stopOpacity={0}/></linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
+                    <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                    <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                    <Tooltip content={<LightTooltip/>}/>
+                    <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
+                    <Area type="monotone" dataKey="lineKm" name="Line Service" stroke={C.blue} strokeWidth={2} fill="url(#gLine)" isAnimationActive animationDuration={900}/>
+                    <Area type="monotone" dataKey="totalKm" name="Total Routes" stroke={C.orange} strokeWidth={2} fill="url(#gCharter)" isAnimationActive animationDuration={1100}/>
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
+          </Container>
+        </div>
       )}
 
       {/* ── RAIL TAB */}
       {activeTab==="rail" && mounted && (
-        <Container className="py-8" style={{animation:"fadeIn 0.35s ease"}}>
-          <SectionTitle icon={Train} title="Magdeburg Hauptbahnhof — Ticket Sales 1998–2019" subtitle="Source: Vertriebskennziffern | Local tickets collapsed; long-distance rail surged 15×" color={C.orange}/>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-            <StatCard icon={Train}      value="716k"    label="Total Tickets" sub="2019 (thousands)" color={C.orange} animate/>
-            <StatCard icon={Navigation} value="415k"    label="Long-Distance" sub="ICE/IC 2019" color={C.blue} animate/>
-            <StatCard icon={Activity}   value="165k"    label="Local/Regional" sub="2019 vs 977k in 1998" color={C.red} animate/>
-            <StatCard icon={TrendingUp} value="+1,474%" label="ICE growth" sub="1998 → 2012" color={C.green} animate/>
-          </div>
-          <ChartCard title="🚆 Ticket Sales — Local vs Long-Distance (thousands)" height={320}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={HBF_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                <defs>
-                  <linearGradient id="gHbfTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.purple} stopOpacity={0.15}/><stop offset="95%" stopColor={C.purple} stopOpacity={0}/></linearGradient>
-                  <linearGradient id="gHbfLong"  x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue}   stopOpacity={0.15}/><stop offset="95%" stopColor={C.blue}   stopOpacity={0}/></linearGradient>
-                  <linearGradient id="gHbfLocal" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.orange} stopOpacity={0.15}/><stop offset="95%" stopColor={C.orange} stopOpacity={0}/></linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
-                <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} label={{value:"Tickets (k)",angle:-90,position:"insideLeft",fill:C.muted,fontSize:11}}/>
-                <Tooltip content={<LightTooltip/>}/>
-                <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
-                <Area type="monotone" dataKey="total"    name="Total"          stroke={C.purple} strokeWidth={2}   fill="url(#gHbfTotal)" isAnimationActive animationDuration={800}/>
-                <Area type="monotone" dataKey="longDist" name="Long-Distance"  stroke={C.blue}   strokeWidth={2.5} fill="url(#gHbfLong)"  isAnimationActive animationDuration={1000}/>
-                <Area type="monotone" dataKey="local"    name="Local/Regional" stroke={C.orange} strokeWidth={2}   fill="url(#gHbfLocal)" isAnimationActive animationDuration={1100}/>
-              </AreaChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </Container>
+        <div style={FADE_IN}>
+          <Container className="py-8">
+            <SectionTitle icon={Train} title="Magdeburg Hauptbahnhof — Ticket Sales 1998–2019" subtitle="Source: Vertriebskennziffern | Local tickets collapsed; long-distance rail surged 15×" color={C.orange}/>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+              <StatCard icon={Train}      value="716k"    label="Total Tickets" sub="2019 (thousands)" color={C.orange} animate/>
+              <StatCard icon={Navigation} value="415k"    label="Long-Distance" sub="ICE/IC 2019" color={C.blue} animate/>
+              <StatCard icon={Activity}   value="165k"    label="Local/Regional" sub="2019 vs 977k in 1998" color={C.red} animate/>
+              <StatCard icon={TrendingUp} value="+1,474%" label="ICE growth" sub="1998 → 2012" color={C.green} animate/>
+            </div>
+            <ChartCard title="🚆 Ticket Sales — Local vs Long-Distance (thousands)" height={320}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={HBF_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                  <defs>
+                    <linearGradient id="gHbfTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.purple} stopOpacity={0.15}/><stop offset="95%" stopColor={C.purple} stopOpacity={0}/></linearGradient>
+                    <linearGradient id="gHbfLong"  x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue}   stopOpacity={0.15}/><stop offset="95%" stopColor={C.blue}   stopOpacity={0}/></linearGradient>
+                    <linearGradient id="gHbfLocal" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.orange} stopOpacity={0.15}/><stop offset="95%" stopColor={C.orange} stopOpacity={0}/></linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
+                  <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                  <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} label={{value:"Tickets (k)",angle:-90,position:"insideLeft",fill:C.muted,fontSize:11}}/>
+                  <Tooltip content={<LightTooltip/>}/>
+                  <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
+                  <Area type="monotone" dataKey="total"    name="Total"          stroke={C.purple} strokeWidth={2}   fill="url(#gHbfTotal)" isAnimationActive animationDuration={800}/>
+                  <Area type="monotone" dataKey="longDist" name="Long-Distance"  stroke={C.blue}   strokeWidth={2.5} fill="url(#gHbfLong)"  isAnimationActive animationDuration={1000}/>
+                  <Area type="monotone" dataKey="local"    name="Local/Regional" stroke={C.orange} strokeWidth={2}   fill="url(#gHbfLocal)" isAnimationActive animationDuration={1100}/>
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartCard>
+          </Container>
+        </div>
       )}
 
       <style>{`
