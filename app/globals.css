@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* ─── Design tokens ─────────────────────────────────────────────────────────── */
 :root {
@@ -61,17 +59,20 @@ a {
 }
 
 /* ─── Tailwind dark-mode overrides via CSS vars ─────────────────────────────── */
+/* Cards / panels */
 .dark .bg-white          { background-color: var(--bg-card) !important; }
 .dark .bg-\[\#f8fafc\]  { background-color: var(--bg-base) !important; }
 .dark .bg-slate-50       { background-color: var(--bg-subtle) !important; }
 .dark .bg-slate-100      { background-color: var(--bg-subtle) !important; }
 
+/* Borders */
 .dark .border-slate-200  { border-color: var(--border) !important; }
 .dark .border-gray-200   { border-color: var(--border) !important; }
 .dark .border-\[\#e8edf5\] { border-color: var(--border) !important; }
 .dark .border-\[\#e1e7f0\] { border-color: var(--border) !important; }
 .dark .divide-\[\#e8edf5\] > * { border-color: var(--border) !important; }
 
+/* Text */
 .dark .text-\[\#061B46\] { color: var(--text-primary) !important; }
 .dark .text-\[\#061b46\] { color: var(--text-primary) !important; }
 .dark .text-gray-900     { color: var(--text-primary) !important; }
@@ -80,8 +81,10 @@ a {
 .dark .text-slate-400    { color: var(--text-muted) !important; }
 .dark .text-slate-600    { color: var(--text-secondary) !important; }
 
+/* Navbar specific */
 .dark header.sticky      { background-color: var(--nav-bg) !important; border-color: var(--nav-border) !important; }
 
+/* Inputs / selects in dark mode */
 .dark input,
 .dark select,
 .dark textarea {
@@ -90,6 +93,7 @@ a {
   border-color: var(--border) !important;
 }
 
+/* Horizontal rules / dividers */
 .dark .bg-\[\#d9e1ef\]  { background-color: var(--border) !important; }
 
 /* ─── Scrollbar utility ──────────────────────────────────────────────────────── */
