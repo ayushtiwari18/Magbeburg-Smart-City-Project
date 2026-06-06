@@ -12,12 +12,13 @@ const navItems = [
   { de: "Sicherheit",        en: "Safety",           href: "/safety" },
   { de: "Mobilität",         en: "Transportation",   href: "/transportation" },
   { de: "Klima",             en: "Climate",          href: "/climate" },
+  { de: "Wirtschaft",        en: "Economy",          href: "/economy" },
+  { de: "Wohnen",            en: "Housing",          href: "/housing" },
   { de: "KI-Straßenlichter", en: "AI Streetlights",  href: "/ai-streetlights" },
   { de: "Projekte",          en: "Projects",         href: "/projects" },
   { de: "Einblicke",         en: "Insights",         href: "/insights" },
   { de: "Veranstaltungen",   en: "Events",           href: "/events" },
   { de: "Karte",             en: "Map",              href: "/map" },
-  { de: "Wohnen",            en: "Housing",          href: "/housing" },
 ];
 
 export default function Navbar() {
