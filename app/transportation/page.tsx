@@ -9,6 +9,7 @@ import {
   AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from "recharts";
+import Container from "@/components/layout/Container";
 
 // ── Recharts dynamic import guard (SSR-safe)
 const IS_BROWSER = typeof window !== "undefined";
@@ -116,7 +117,7 @@ const MOTORISATION_DATA = FLEET_DATA.map(d => ({
   carsPer1k:  +(d.cars/237565*1000).toFixed(1),
 }));
 
-// ── GTFS / live map config (unchanged from original)
+// ── GTFS / live map config
 interface KissRow { [key: string]: number | string | null; }
 interface KissData { columns: { id: string; label: string; unit?: string }[]; rows: KissRow[]; }
 interface GtfsStop { stop_id: string; stop_name: string; stop_lat: string; stop_lon: string; }
@@ -176,7 +177,7 @@ async function parseGtfsFile<T>(zipUrl:string, filename:string): Promise<T[]> {
   });
 }
 
-// ── Custom tooltip ──────────────────────────────────────────────────────────
+// ── Custom tooltip
 const DarkTooltip = ({ active, payload, label }: {
   active?:boolean; payload?:{name:string;value:number;color:string}[]; label?:string;
 }) => {
@@ -195,7 +196,7 @@ const DarkTooltip = ({ active, payload, label }: {
   );
 };
 
-// ── Stat card ───────────────────────────────────────────────────────────────
+// ── Stat card
 function StatCard({icon:Icon,value,label,sub,color="#58a6ff",animate=false}:{
   icon:React.ElementType;value:string;label:string;sub?:string;color?:string;animate?:boolean;
 }) {
@@ -213,7 +214,7 @@ function StatCard({icon:Icon,value,label,sub,color="#58a6ff",animate=false}:{
   );
 }
 
-// ── Section heading ─────────────────────────────────────────────────────────
+// ── Section heading
 function SectionTitle({icon:Icon,title,subtitle,color="#58a6ff"}:{
   icon:React.ElementType;title:string;subtitle:string;color?:string;
 }) {
@@ -230,7 +231,7 @@ function SectionTitle({icon:Icon,title,subtitle,color="#58a6ff"}:{
   );
 }
 
-// ── Chart card wrapper ───────────────────────────────────────────────────────
+// ── Chart card wrapper
 function ChartCard({title,children,height=280}:{title:string;children:React.ReactNode;height?:number}) {
   return (
     <div style={{background:C.panel,border:`1px solid ${C.border}`,borderRadius:12,padding:"18px 20px"}}>
@@ -240,7 +241,7 @@ function ChartCard({title,children,height=280}:{title:string;children:React.Reac
   );
 }
 
-// ── Donut (SVG, no dep) ─────────────────────────────────────────────────────
+// ── Donut (SVG, no dep)
 function DonutChart({segments,size=72}:{segments:{label:string;value:number;color:string}[];size?:number}) {
   const total=segments.reduce((s,d)=>s+d.value,0);
   if(total===0) return <div style={{height:size,display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{width:20,height:20,borderRadius:"50%",border:"3px solid rgba(255,255,255,0.1)",borderTopColor:"#60a5fa",animation:"spin 0.8s linear infinite"}}/></div>;
@@ -268,7 +269,7 @@ function DonutChart({segments,size=72}:{segments:{label:string;value:number;colo
   );
 }
 
-// ── Peak bar chart ───────────────────────────────────────────────────────────
+// ── Peak bar chart
 function PeakChart({visible}:{visible:Set<string>}) {
   const combined=Array.from({length:24},(_,h)=>OPERATORS.filter(op=>visible.has(op.key)).reduce((s,op)=>s+(op.peakHours[h]??0),0));
   const max=Math.max(...combined,1);const peakH=combined.indexOf(Math.max(...combined));
@@ -429,70 +430,90 @@ export default function Transportation() {
   const CARD:React.CSSProperties={background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:"10px 12px",marginBottom:8};
   const LABEL:React.CSSProperties={fontSize:9,fontWeight:700,color:"#475569",textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:6,display:"flex",alignItems:"center",gap:3};
 
-  // ── Latest fleet snapshot
   const latest = FLEET_DATA.at(-1)!;
 
   return (
-    <div style={{display:"flex",flexDirection:"column",height:"100vh",overflow:"hidden",fontFamily:"Inter,system-ui,sans-serif",background:C.bg,color:C.text}}>
+    // ── FIX: was height:100vh + overflow:hidden (broke Navbar/Footer layout)
+    // Now: normal page flow; only the Live Map inner area gets a fixed height
+    <div className="bg-[#f8fafc] min-h-screen">
 
-      {/* ══ TOP STRIP ══ */}
-      <div style={{background:"#0c1526",borderBottom:`1px solid ${C.border}`,padding:"8px 16px",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:6}}>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <div style={{width:30,height:30,borderRadius:7,background:"#1d4ed8",display:"flex",alignItems:"center",justifyContent:"center"}}><Bus size={15} color="white"/></div>
-          <div>
-            <div style={{fontSize:13,fontWeight:700,color:"white",lineHeight:1}}>Transport Network</div>
-            <div style={{fontSize:9,color:"#60a5fa",marginTop:1}}>Magdeburg · {timeStr} · {allLoaded?"● Live":"◌ Loading…"}</div>
+      {/* ── Light page header — matches Climate / Safety / Housing pattern */}
+      <section className="bg-white border-b border-slate-200">
+        <Container className="py-10">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
+              <Bus className="h-7 w-7 text-blue-700" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
+                MVB · GTFS · KISS-MD · Kraftfahrzeugbestand
+              </p>
+              <h1 className="text-3xl font-bold text-[#061B46]">Transportation — Magdeburg</h1>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* ── Dark dashboard panel (contained, scrollable) */}
+      <div style={{fontFamily:"Inter,system-ui,sans-serif",background:C.bg,color:C.text}}>
+
+        {/* ══ TOP STRIP ══ */}
+        <div style={{background:"#0c1526",borderBottom:`1px solid ${C.border}`,padding:"8px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:6}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <div style={{width:30,height:30,borderRadius:7,background:"#1d4ed8",display:"flex",alignItems:"center",justifyContent:"center"}}><Bus size={15} color="white"/></div>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:"white",lineHeight:1}}>Transport Network</div>
+              <div style={{fontSize:9,color:"#60a5fa",marginTop:1}}>Magdeburg · {timeStr} · {allLoaded?"● Live":"◌ Loading…"}</div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
+            {[
+              {Icon:MapPin,  val:totalStops>0?totalStops.toLocaleString():"—",  label:"Stops",    c:"#3b82f6"},
+              {Icon:TrendingUp,val:totalRoutes>0?String(totalRoutes):"—",       label:"Routes",   c:"#06b6d4"},
+              {Icon:Users,  val:latestRidership?`${(latestRidership.passengers/1e6).toFixed(1)}M`:"—",label:`Rides ${latestRidership?.year??""}`,c:"#8b5cf6"},
+              {Icon:Train,  val:String(OPERATORS.filter(o=>visible.has(o.key)).length),label:"Active",c:"#10b981"},
+              {Icon:Car,    val:latest.total.toLocaleString(),label:"Vehicles 2025",c:C.yellow},
+            ].map(k=>(
+              <div key={k.label} style={{display:"flex",alignItems:"center",gap:4,background:"rgba(255,255,255,0.05)",border:`1px solid ${C.border}`,borderRadius:16,padding:"3px 8px"}}>
+                <k.Icon size={10} color={k.c}/>
+                <span style={{fontSize:12,fontWeight:700,color:"white",fontVariantNumeric:"tabular-nums"}}>{k.val}</span>
+                <span style={{fontSize:9,color:"#64748b"}}>{k.label}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+            {OPERATORS.map(op=>{
+              const on=visible.has(op.key);const loading=opLoading[op.key];const Icon=op.Icon;
+              return(
+                <button key={op.key} onClick={()=>toggleOperator(op.key)}
+                  style={{display:"flex",alignItems:"center",gap:3,padding:"3px 8px",borderRadius:16,fontSize:10,fontWeight:600,border:`1.5px solid ${on?op.color:"rgba(255,255,255,0.12)"}`,background:on?op.color:"transparent",color:on?"white":"#64748b",cursor:"pointer",transition:"all 0.15s",opacity:on?1:0.5}}>
+                  {loading?<span style={{width:7,height:7,borderRadius:"50%",border:"1.5px solid rgba(255,255,255,0.3)",borderTopColor:"white",display:"inline-block",animation:"spin 0.7s linear infinite"}}/>:on?<Eye size={8}/>:<EyeOff size={8}/>}
+                  <Icon size={8}/><span>{op.label}</span>
+                  <span style={{fontSize:8}}>{op.vehicleEmoji}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
-        <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
-          {[
-            {Icon:MapPin,  val:totalStops>0?totalStops.toLocaleString():"—",  label:"Stops",    c:"#3b82f6"},
-            {Icon:TrendingUp,val:totalRoutes>0?String(totalRoutes):"—",       label:"Routes",   c:"#06b6d4"},
-            {Icon:Users,  val:latestRidership?`${(latestRidership.passengers/1e6).toFixed(1)}M`:"—",label:`Rides ${latestRidership?.year??""}`,c:"#8b5cf6"},
-            {Icon:Train,  val:String(OPERATORS.filter(o=>visible.has(o.key)).length),label:"Active",c:"#10b981"},
-            {Icon:Car,    val:latest.total.toLocaleString(),label:"Vehicles 2025",c:C.yellow},
-          ].map(k=>(
-            <div key={k.label} style={{display:"flex",alignItems:"center",gap:4,background:"rgba(255,255,255,0.05)",border:`1px solid ${C.border}`,borderRadius:16,padding:"3px 8px"}}>
-              <k.Icon size={10} color={k.c}/>
-              <span style={{fontSize:12,fontWeight:700,color:"white",fontVariantNumeric:"tabular-nums"}}>{k.val}</span>
-              <span style={{fontSize:9,color:"#64748b"}}>{k.label}</span>
-            </div>
-          ))}
-        </div>
-        <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
-          {OPERATORS.map(op=>{
-            const on=visible.has(op.key);const loading=opLoading[op.key];const Icon=op.Icon;
+
+        {/* ══ TAB BAR ══ */}
+        <div style={{background:"#0c1526",borderBottom:`1px solid ${C.border}`,padding:"0 16px",display:"flex",gap:2}}>
+          {TABS.map(tab=>{
+            const active=activeTab===tab.id;
             return(
-              <button key={op.key} onClick={()=>toggleOperator(op.key)}
-                style={{display:"flex",alignItems:"center",gap:3,padding:"3px 8px",borderRadius:16,fontSize:10,fontWeight:600,border:`1.5px solid ${on?op.color:"rgba(255,255,255,0.12)"}`,background:on?op.color:"transparent",color:on?"white":"#64748b",cursor:"pointer",transition:"all 0.15s",opacity:on?1:0.5}}>
-                {loading?<span style={{width:7,height:7,borderRadius:"50%",border:"1.5px solid rgba(255,255,255,0.3)",borderTopColor:"white",display:"inline-block",animation:"spin 0.7s linear infinite"}}/>:on?<Eye size={8}/>:<EyeOff size={8}/>}
-                <Icon size={8}/><span>{op.label}</span>
-                <span style={{fontSize:8}}>{op.vehicleEmoji}</span>
+              <button key={tab.id} onClick={()=>setActiveTab(tab.id)}
+                style={{padding:"10px 14px",fontSize:12,fontWeight:active?700:500,background:"transparent",border:"none",borderBottom:active?`2px solid ${C.blue}`:"2px solid transparent",color:active?C.blue:C.muted,cursor:"pointer",transition:"all 0.15s",whiteSpace:"nowrap"}}>
+                {tab.label}
               </button>
             );
           })}
         </div>
-      </div>
 
-      {/* ══ TAB BAR ══ */}
-      <div style={{background:"#0c1526",borderBottom:`1px solid ${C.border}`,padding:"0 16px",display:"flex",gap:2,flexShrink:0}}>
-        {TABS.map(tab=>{
-          const active=activeTab===tab.id;
-          return(
-            <button key={tab.id} onClick={()=>setActiveTab(tab.id)}
-              style={{padding:"10px 14px",fontSize:12,fontWeight:active?700:500,background:"transparent",border:"none",borderBottom:active?`2px solid ${C.blue}`:"2px solid transparent",color:active?C.blue:C.muted,cursor:"pointer",transition:"all 0.15s",whiteSpace:"nowrap"}}>
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+        {/* ══ BODY ══ */}
 
-      {/* ══ BODY ══ */}
-      <div style={{flex:1,minHeight:0,overflow:"hidden",display:"flex"}}>
-
-        {/* ══════════════════ LIVE MAP TAB ══════════════════ */}
+        {/* ══ LIVE MAP TAB — fixed height so map renders correctly ══ */}
         {activeTab==="live" && (
-          <div style={{display:"flex",flex:1,minHeight:0,overflow:"hidden"}}>
+          <div style={{display:"flex",height:"calc(100vh - 64px)",minHeight:500,overflow:"hidden"}}>
             {/* sidebar */}
             <div style={{width:sidebarOpen?290:0,minWidth:sidebarOpen?290:0,overflow:"hidden",transition:"width 0.25s,min-width 0.25s",background:"#0f172a",borderRight:`1px solid ${C.border}`,display:"flex",flexDirection:"column"}}>
               <div style={{flex:1,overflowY:"auto",padding:"12px 12px 8px",scrollbarWidth:"none"}}>
@@ -557,9 +578,9 @@ export default function Transportation() {
           </div>
         )}
 
-        {/* ══════════════════ FLEET TAB ══════════════════ */}
+        {/* ══ FLEET TAB ══ */}
         {activeTab==="fleet" && mounted && (
-          <div style={{flex:1,overflowY:"auto",padding:"24px",animation:"fadeIn 0.35s ease"}}>
+          <div style={{padding:"24px",animation:"fadeIn 0.35s ease"}}>
             <SectionTitle icon={Car} title="Vehicle Fleet — Magdeburg 2011–2025" subtitle="Source: Kraftfahrzeugbestand | Steady growth to 144,339 registered vehicles" color={C.blue}/>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,marginBottom:24}}>
               <StatCard icon={Car}        value={latest.total.toLocaleString()} label="Total Vehicles" sub="2025" color={C.blue} animate/>
@@ -625,9 +646,9 @@ export default function Transportation() {
           </div>
         )}
 
-        {/* ══════════════════ GREEN TAB ══════════════════ */}
+        {/* ══ GREEN TAB ══ */}
         {activeTab==="green" && mounted && (
-          <div style={{flex:1,overflowY:"auto",padding:"24px",animation:"fadeIn 0.35s ease"}}>
+          <div style={{padding:"24px",animation:"fadeIn 0.35s ease"}}>
             <SectionTitle icon={Leaf} title="Green & Alternative Fuel Vehicles" subtitle="Source: Fahrzeugbestand Kraftstoff | EV and hybrid registrations surging since 2023" color={C.green}/>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,marginBottom:24}}>
               <StatCard icon={Zap}    value="2,679" label="Pure Electric" sub="2024 city total" color={C.yellow} animate/>
@@ -665,9 +686,9 @@ export default function Transportation() {
           </div>
         )}
 
-        {/* ══════════════════ LICENCES TAB ══════════════════ */}
+        {/* ══ LICENCES TAB ══ */}
         {activeTab==="licences" && mounted && (
-          <div style={{flex:1,overflowY:"auto",padding:"24px",animation:"fadeIn 0.35s ease"}}>
+          <div style={{padding:"24px",animation:"fadeIn 0.35s ease"}}>
             <SectionTitle icon={BarChart2} title="Driver's Licences Issued — Magdeburg" subtitle="Source: Führerscheine | Post-COVID surge: 12,527 in 2022 vs 5,843 in 2020" color={C.purple}/>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,marginBottom:24}}>
               <StatCard icon={BarChart2} value="12,770" label="Total Licences" sub="2025" color={C.purple} animate/>
@@ -675,29 +696,27 @@ export default function Transportation() {
               <StatCard icon={Activity}  value="1,163"  label="Motorcycles" sub="2025" color={C.orange} animate/>
               <StatCard icon={TrendingUp} value="+119%" label="Growth 2020→2022" sub="COVID rebound" color={C.green} animate/>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr",gap:16}}>
-              <ChartCard title="🪪 Licences Issued per Year — by Category" height={300}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={LICENCE_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                    <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                    <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                    <Tooltip content={<DarkTooltip/>}/>
-                    <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
-                    <Bar dataKey="car" name="Car (B)" fill={C.blue} stackId="a" isAnimationActive animationDuration={800}/>
-                    <Bar dataKey="moto" name="Motorcycle" fill={C.orange} stackId="a" isAnimationActive animationDuration={900}/>
-                    <Bar dataKey="truck" name="Truck/HGV" fill={C.green} stackId="a" radius={[4,4,0,0]} isAnimationActive animationDuration={1000}/>
-                    <Line type="monotone" dataKey="total" name="Total" stroke={C.purple} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1200}/>
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartCard>
-            </div>
+            <ChartCard title="🪪 Licences Issued per Year — by Category" height={300}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={LICENCE_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                  <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                  <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                  <Tooltip content={<DarkTooltip/>}/>
+                  <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
+                  <Bar dataKey="car" name="Car (B)" fill={C.blue} stackId="a" isAnimationActive animationDuration={800}/>
+                  <Bar dataKey="moto" name="Motorcycle" fill={C.orange} stackId="a" isAnimationActive animationDuration={900}/>
+                  <Bar dataKey="truck" name="Truck/HGV" fill={C.green} stackId="a" radius={[4,4,0,0]} isAnimationActive animationDuration={1000}/>
+                  <Line type="monotone" dataKey="total" name="Total" stroke={C.purple} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1200}/>
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
           </div>
         )}
 
-        {/* ══════════════════ BOATS TAB ══════════════════ */}
+        {/* ══ BOATS TAB ══ */}
         {activeTab==="boats" && mounted && (
-          <div style={{flex:1,overflowY:"auto",padding:"24px",animation:"fadeIn 0.35s ease"}}>
+          <div style={{padding:"24px",animation:"fadeIn 0.35s ease"}}>
             <SectionTitle icon={Anchor} title="Weiße Flotte — River Transport 2017–2024" subtitle="Source: Weisse Flotte GmbH | COVID dip 2018–2020, strong rebound to 41,525 passengers in 2024" color={C.teal}/>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,marginBottom:24}}>
               <StatCard icon={Users}      value="41,525" label="Passengers 2024" sub="+24% vs 2023" color={C.teal} animate/>
@@ -753,9 +772,9 @@ export default function Transportation() {
           </div>
         )}
 
-        {/* ══════════════════ RAIL TAB ══════════════════ */}
+        {/* ══ RAIL TAB ══ */}
         {activeTab==="rail" && mounted && (
-          <div style={{flex:1,overflowY:"auto",padding:"24px",animation:"fadeIn 0.35s ease"}}>
+          <div style={{padding:"24px",animation:"fadeIn 0.35s ease"}}>
             <SectionTitle icon={Train} title="Magdeburg Hauptbahnhof — Ticket Sales 1998–2019" subtitle="Source: Vertriebskennziffern | Local tickets collapsed; long-distance rail surged 15× in 20 years" color={C.orange}/>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,marginBottom:24}}>
               <StatCard icon={Train}      value="716k"  label="Total Tickets" sub="2019 (thousands)" color={C.orange} animate/>
@@ -763,40 +782,38 @@ export default function Transportation() {
               <StatCard icon={Activity}   value="165k"  label="Local/Regional" sub="2019 vs 977k in 1998" color={C.red} animate/>
               <StatCard icon={TrendingUp} value="+1,474%" label="ICE growth" sub="1998 → 2012" color={C.green} animate/>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr",gap:16}}>
-              <ChartCard title="🚆 Ticket Sales Breakdown — Local vs Long-Distance (thousands)" height={320}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={HBF_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                    <defs>
-                      <linearGradient id="gHbfTotal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={C.purple} stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor={C.purple} stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="gHbfLong" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={C.blue} stopOpacity={0.25}/>
-                        <stop offset="95%" stopColor={C.blue} stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="gHbfLocal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={C.orange} stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor={C.orange} stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                    <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                    <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} label={{value:"Tickets (k)",angle:-90,position:"insideLeft",fill:C.muted,fontSize:11}}/>
-                    <Tooltip content={<DarkTooltip/>}/>
-                    <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
-                    <Area type="monotone" dataKey="total" name="Total" stroke={C.purple} strokeWidth={2} fill="url(#gHbfTotal)" isAnimationActive animationDuration={800}/>
-                    <Area type="monotone" dataKey="longDist" name="Long-Distance" stroke={C.blue} strokeWidth={2.5} fill="url(#gHbfLong)" isAnimationActive animationDuration={1000}/>
-                    <Area type="monotone" dataKey="local" name="Local/Regional" stroke={C.orange} strokeWidth={2} fill="url(#gHbfLocal)" isAnimationActive animationDuration={1100}/>
-                  </AreaChart>
-                </ResponsiveContainer>
-              </ChartCard>
-            </div>
+            <ChartCard title="🚆 Ticket Sales Breakdown — Local vs Long-Distance (thousands)" height={320}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={HBF_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                  <defs>
+                    <linearGradient id="gHbfTotal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={C.purple} stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor={C.purple} stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="gHbfLong" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={C.blue} stopOpacity={0.25}/>
+                      <stop offset="95%" stopColor={C.blue} stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="gHbfLocal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={C.orange} stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor={C.orange} stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                  <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                  <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} label={{value:"Tickets (k)",angle:-90,position:"insideLeft",fill:C.muted,fontSize:11}}/>
+                  <Tooltip content={<DarkTooltip/>}/>
+                  <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
+                  <Area type="monotone" dataKey="total" name="Total" stroke={C.purple} strokeWidth={2} fill="url(#gHbfTotal)" isAnimationActive animationDuration={800}/>
+                  <Area type="monotone" dataKey="longDist" name="Long-Distance" stroke={C.blue} strokeWidth={2.5} fill="url(#gHbfLong)" isAnimationActive animationDuration={1000}/>
+                  <Area type="monotone" dataKey="local" name="Local/Regional" stroke={C.orange} strokeWidth={2} fill="url(#gHbfLocal)" isAnimationActive animationDuration={1100}/>
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartCard>
           </div>
         )}
 
-      </div>{/* end body */}
+      </div>{/* end dark dashboard */}
 
       <style>{`
         ::-webkit-scrollbar{display:none}
