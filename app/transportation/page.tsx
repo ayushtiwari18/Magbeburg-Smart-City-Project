@@ -14,7 +14,6 @@ import Container from "@/components/layout/Container";
 const RAW = "https://raw.githubusercontent.com/SmartCityMagdeburg2026/Datasources/main/data";
 const GTFS_BASE = `${RAW}/OEV-Daten_NASA_GmbH/GTFS`;
 
-// ── Light-mode colour palette
 const C = {
   blue:   "#2563eb",
   orange: "#ea580c",
@@ -31,7 +30,6 @@ const C = {
   pageBg: "#f8fafc",
 };
 
-// ── Static dashboard data
 const FLEET_DATA = [
   {year:2011,cars:100619,trucks:13383,motorcycles:4817,bicycles:716,total:123590},
   {year:2012,cars:101847,trucks:13738,motorcycles:4959,bicycles:642,total:125346},
@@ -173,7 +171,6 @@ async function parseGtfsFile<T>(zipUrl:string, filename:string): Promise<T[]> {
   });
 }
 
-// ── Light tooltip
 const LightTooltip = ({ active, payload, label }: {
   active?:boolean; payload?:{name:string;value:number;color:string}[]; label?:string;
 }) => {
@@ -192,7 +189,6 @@ const LightTooltip = ({ active, payload, label }: {
   );
 };
 
-// ── Stat card (light)
 function StatCard({icon:Icon,value,label,sub,color=C.blue,delta,animate=false}:{
   icon:React.ElementType;value:string;label:string;sub?:string;color?:string;delta?:string;animate?:boolean;
 }) {
@@ -215,7 +211,6 @@ function StatCard({icon:Icon,value,label,sub,color=C.blue,delta,animate=false}:{
   );
 }
 
-// ── Section heading (light)
 function SectionTitle({icon:Icon,title,subtitle,color=C.blue}:{
   icon:React.ElementType;title:string;subtitle:string;color?:string;
 }) {
@@ -232,7 +227,6 @@ function SectionTitle({icon:Icon,title,subtitle,color=C.blue}:{
   );
 }
 
-// ── Chart card wrapper (light)
 function ChartCard({title,children,height=280}:{title:string;children:React.ReactNode;height?:number}) {
   return (
     <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
@@ -242,7 +236,6 @@ function ChartCard({title,children,height=280}:{title:string;children:React.Reac
   );
 }
 
-// ── Donut (SVG)
 function DonutChart({segments,size=72}:{segments:{label:string;value:number;color:string}[];size?:number}) {
   const total=segments.reduce((s,d)=>s+d.value,0);
   if(total===0) return <div style={{height:size,display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{width:20,height:20,borderRadius:"50%",border:"3px solid #e2e8f0",borderTopColor:"#2563eb",animation:"spin 0.8s linear infinite"}}/></div>;
@@ -270,7 +263,6 @@ function DonutChart({segments,size=72}:{segments:{label:string;value:number;colo
   );
 }
 
-// ── Peak bar chart
 function PeakChart({visible}:{visible:Set<string>}) {
   const combined=Array.from({length:24},(_,h)=>OPERATORS.filter(op=>visible.has(op.key)).reduce((s,op)=>s+(op.peakHours[h]??0),0));
   const max=Math.max(...combined,1);const peakH=combined.indexOf(Math.max(...combined));
@@ -297,6 +289,25 @@ const TABS = [
 
 const FADE_IN: React.CSSProperties = { animation: "fadeIn 0.35s ease" };
 
+// ── Mini sparkline for glance bar
+function MiniSparkline({data,color}:{data:{passengers:number}[];color:string}) {
+  if (data.length < 2) return null;
+  const vals = data.map(d => d.passengers);
+  const min = Math.min(...vals); const max = Math.max(...vals);
+  const W = 80; const H = 28;
+  const pts = vals.map((v,i) => {
+    const x = (i / (vals.length - 1)) * (W - 4) + 2;
+    const y = H - 4 - ((v - min) / (max - min || 1)) * (H - 8);
+    return `${x},${y}`;
+  }).join(" ");
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{width:W,height:H}}>
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.8" strokeLinejoin="round" opacity="0.9"/>
+      <circle cx={pts.split(" ").at(-1)?.split(",")[0]} cy={pts.split(" ").at(-1)?.split(",")[1]} r="2.5" fill={color}/>
+    </svg>
+  );
+}
+
 export default function Transportation() {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<unknown>(null);
@@ -313,8 +324,17 @@ export default function Transportation() {
   const [kissLoading, setKissLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [liveTime, setLiveTime] = useState("");
 
   useEffect(()=>{ setMounted(true); },[]);
+
+  // Live clock
+  useEffect(()=>{
+    const tick = () => setLiveTime(new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit",second:"2-digit"}));
+    tick();
+    const t = setInterval(tick, 1000);
+    return () => clearInterval(t);
+  },[]);
 
   useEffect(()=>{
     if(document.getElementById("tp-style")) return;
@@ -421,67 +441,82 @@ export default function Transportation() {
   const latestRidership=ridershipData.at(-1);
   const maxPass=Math.max(...ridershipData.map(d=>d.passengers),1);
   const donutData=OPERATORS.map(op=>({label:op.label,value:opRoutes[op.key]?.length??0,color:op.color})).filter(d=>d.value>0);
-  const now=new Date();
-  const timeStr=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
   const latest = FLEET_DATA.at(-1)!;
+
+  // KPI tiles for glance bar
+  const kpiTiles = [
+    { Icon:MapPin,    val:totalStops>0?totalStops.toLocaleString():"—",                        label:"Stops",          sub:"GTFS live",        color:"#60a5fa" },
+    { Icon:TrendingUp,val:totalRoutes>0?String(totalRoutes):"—",                               label:"Routes",         sub:"all operators",    color:"#34d399" },
+    { Icon:Users,     val:latestRidership?`${(latestRidership.passengers/1e6).toFixed(1)}M`:"—",label:`Rides ${latestRidership?.year??""}`, sub:"MVB passengers", color:"#c084fc" },
+    { Icon:Train,     val:String(OPERATORS.filter(o=>visible.has(o.key)).length),              label:"Active Ops",     sub:"visible on map",   color:"#fb923c" },
+    { Icon:Car,       val:latest.total.toLocaleString(),                                       label:"Fleet 2025",     sub:"registered vehicles",color:"#fbbf24"},
+    { Icon:Zap,       val:"2,679",                                                             label:"EVs 2024",       sub:"pure electric",    color:"#4ade80" },
+  ];
 
   return (
     <div className="bg-[#f8fafc] min-h-screen">
 
-      {/* ── Page Header */}
-      <section className="bg-white border-b border-slate-200">
-        <Container className="py-10">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
-              <Bus className="h-7 w-7 text-blue-700" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
-                MVB · GTFS · KISS-MD · Kraftfahrzeugbestand
-              </p>
-              <h1 className="text-3xl font-bold text-[#061B46]">Transportation — Magdeburg</h1>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* ── KPI strip */}
-      <div className="bg-white border-b border-slate-200">
-        <Container className="py-3">
-          <div className="flex flex-wrap items-center gap-3">
-            {[
-              {Icon:MapPin,   val:totalStops>0?totalStops.toLocaleString():"—",     label:"Stops",         c:C.blue},
-              {Icon:TrendingUp,val:totalRoutes>0?String(totalRoutes):"—",           label:"Routes",        c:C.teal},
-              {Icon:Users,   val:latestRidership?`${(latestRidership.passengers/1e6).toFixed(1)}M`:"—",label:`Rides ${latestRidership?.year??""}`,c:C.purple},
-              {Icon:Train,   val:String(OPERATORS.filter(o=>visible.has(o.key)).length), label:"Active Ops",c:C.green},
-              {Icon:Car,     val:latest.total.toLocaleString(),                     label:"Vehicles 2025",  c:C.orange},
-              {Icon:Clock,   val:timeStr,                                           label:allLoaded?"Live":"Loading…", c:allLoaded?C.green:C.muted},
-            ].map(k=>(
-              <div key={k.label} className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5">
-                <k.Icon size={11} color={k.c}/>
-                <span className="text-sm font-bold tabular-nums" style={{color:"#061B46"}}>{k.val}</span>
-                <span className="text-xs text-slate-400">{k.label}</span>
+      {/* ── GLANCE BAR — Power BI style sticky header */}
+      <div className="sticky top-0 z-40 bg-[#061B46] border-b border-white/10 shadow-xl">
+        <div className="px-4 lg:px-8">
+          {/* Top row: title + clock + operator toggles */}
+          <div className="flex items-center gap-4 py-2.5 border-b border-white/10">
+            <div className="flex items-center gap-2.5 flex-shrink-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/20">
+                <Bus className="h-4 w-4 text-blue-300" />
               </div>
-            ))}
-            <div className="flex gap-2 flex-wrap ml-auto">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-300/70">Smart City Magdeburg</div>
+                <div className="text-sm font-bold text-white leading-tight">Transportation Dashboard</div>
+              </div>
+            </div>
+            <div className="h-6 w-px bg-white/10 flex-shrink-0"/>
+            {/* Live clock */}
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" style={{animation:"ping 1.5s ease-in-out infinite"}}/>
+              <span className="text-xs font-mono font-bold text-green-300">{liveTime || "—"}</span>
+              <span className="text-[10px] text-white/30 ml-1">{allLoaded ? "● Live" : "● Loading…"}</span>
+            </div>
+            <div className="h-6 w-px bg-white/10 flex-shrink-0"/>
+            {/* Ridership sparkline */}
+            {!kissLoading && ridershipData.length > 1 && (
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className="text-[10px] text-white/40 uppercase tracking-widest">MVB trend</span>
+                <MiniSparkline data={ridershipData} color="#60a5fa"/>
+              </div>
+            )}
+            {/* Operator toggles — pushed right */}
+            <div className="flex gap-1.5 flex-wrap ml-auto">
               {OPERATORS.map(op=>{
                 const on=visible.has(op.key); const Icon=op.Icon;
                 return(
                   <button key={op.key} onClick={()=>toggleOperator(op.key)}
-                    className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-all"
-                    style={{borderColor:on?op.color:"#e2e8f0",background:on?op.color+"18":"white",color:on?op.color:"#94a3b8"}}>
-                    {on?<Eye size={9}/>:<EyeOff size={9}/>}
-                    <Icon size={9}/><span>{op.label}</span>
+                    className="flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold transition-all"
+                    style={{borderColor:on?op.color:op.color+"33",background:on?op.color+"25":"transparent",color:on?op.color:"#ffffff40"}}>
+                    {on?<Eye size={8}/>:<EyeOff size={8}/>}
+                    <Icon size={8}/><span>{op.label}</span>
                   </button>
                 );
               })}
             </div>
           </div>
-        </Container>
+
+          {/* KPI strip */}
+          <div className="grid grid-cols-3 sm:grid-cols-6 divide-x divide-white/10 py-0">
+            {kpiTiles.map(k=>(
+              <div key={k.label} className="flex flex-col items-center justify-center py-3 px-2 text-center group cursor-default hover:bg-white/5 transition-colors">
+                <k.Icon size={12} color={k.color} className="mb-1 opacity-80"/>
+                <div className="text-xl font-bold tabular-nums text-white leading-tight">{k.val}</div>
+                <div className="text-[10px] font-semibold text-white/60 mt-0.5">{k.label}</div>
+                <div className="text-[9px] text-white/30">{k.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* ── Tab Bar */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-30">
+      {/* ── Tab Bar — flush below glance bar */}
+      <div className="bg-white border-b border-slate-200 sticky top-[108px] z-30">
         <Container>
           <div className="flex gap-1 overflow-x-auto">
             {TABS.map(tab=>{
@@ -500,10 +535,10 @@ export default function Transportation() {
 
       {/* ── LIVE MAP TAB */}
       {activeTab==="live" && (
-        <div style={{display:"flex",height:"calc(100vh - 200px)",minHeight:500}}>
+        <div style={{display:"flex",height:"calc(100vh - 148px)",minHeight:500}}>
           {/* sidebar */}
-          <div style={{width:sidebarOpen?280:0,minWidth:sidebarOpen?280:0,overflow:"hidden",transition:"width 0.25s,min-width 0.25s",background:"white",borderRight:"1px solid #e2e8f0",display:"flex",flexDirection:"column"}}>
-            <div style={{flex:1,overflowY:"auto",padding:"14px",scrollbarWidth:"none"}}>
+          <div style={{width:sidebarOpen?240:0,minWidth:sidebarOpen?240:0,overflow:"hidden",transition:"width 0.25s,min-width 0.25s",background:"white",borderRight:"1px solid #e2e8f0",display:"flex",flexDirection:"column"}}>
+            <div style={{flex:1,overflowY:"auto",padding:"12px",scrollbarWidth:"none"}}>
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 mb-3">
                 <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-1"><Users size={9}/>MVB Ridership</div>
                 {kissLoading?Array.from({length:5}).map((_,i)=>(<div key={i} className="flex items-center gap-2 mb-2"><div className="w-6 h-2 rounded bg-slate-200"/><div className="flex-1 h-1.5 rounded bg-slate-200"/><div className="w-7 h-2 rounded bg-slate-200"/></div>)):ridershipData.length===0?(<p className="text-xs text-slate-400 text-center">No data</p>):(
