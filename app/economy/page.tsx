@@ -153,10 +153,6 @@ const MFG_RADAR = [
 ];
 
 // ── NEW: Handwerk (Crafts) datasets ──────────────────────────────────────────
-// Total crafts firms by type 2010-2023
-// var1=total, var2=construction+expansion(Bau/Ausbau), var3=electrical+metal(Elektro/Metall),
-// var4=wood+plastics(Holz/Kunststoff), var5=clothing+textiles(Bekleidung/Textil),
-// var6=food(Lebensmittel), var7=health+hygiene(Gesundheit/Körperpflege), var8=glass/paper/ceramic+other(Glas/Papier/sonstiges)
 const CRAFT_TOTAL = [
   {year:2010,total:2429,construction:643,electrical:655,wood:277,clothing:140,food:23,health:621,glass:70},
   {year:2011,total:2460,construction:659,electrical:649,wood:286,clothing:136,food:23,health:623,glass:84},
@@ -174,11 +170,6 @@ const CRAFT_TOTAL = [
   {year:2023,total:1897,construction:445,electrical:508,wood:146,clothing:100,food:23,health:570,glass:105},
 ];
 
-// Construction/expansion crafts sub-professions (Bau- und Ausbauhandwerk)
-// var2=total, var3=roofers, var4=masons, var5=painters, var6=glaziers, var7=plumbers,
-// var8=heating/ventilation, var9=chimney-sweeps, var10=carpenters, var11=ground/road builders,
-// var12=scaffolders+others, var13=tilers, var14=well-builders, var15=concrete workers,
-// var16=waterproofers, var17=dry-liners+other
 const BUILD_CRAFT_DETAIL = [
   {year:2010,total:643,roofers:35,masons:31,painters:190,plumbers:80,carpenters:47,groundwork:137,tilers:15,concrete:25},
   {year:2011,total:659,roofers:35,masons:32,painters:197,plumbers:82,carpenters:47,groundwork:139,tilers:15,concrete:21},
@@ -196,8 +187,6 @@ const BUILD_CRAFT_DETAIL = [
   {year:2023,total:445,roofers:22,masons:28,painters:114,plumbers:66,carpenters:36,groundwork:82,tilers:13,concrete:19},
 ];
 
-// Wood & plastics crafts
-// var2=total, var3=carpenters(Tischler), var4=wheelwrights(Stellmacher), var5=toy-makers, var6=basket-weavers, var7=others
 const WOOD_CRAFT = [
   {year:2010,total:277,cabinetmakers:188,joiners:29,coopers:9,others:43},
   {year:2012,total:272,cabinetmakers:188,joiners:24,coopers:8,others:45},
@@ -209,7 +198,6 @@ const WOOD_CRAFT = [
   {year:2023,total:146,cabinetmakers:80,joiners:13,coopers:13,others:38},
 ];
 
-// Food crafts
 const FOOD_CRAFT = [
   {year:2010,total:23,bakers:8,butchers:1,confectioners:6,brewers:3,others:5},
   {year:2013,total:20,bakers:8,butchers:1,confectioners:4,brewers:3,others:4},
@@ -219,7 +207,6 @@ const FOOD_CRAFT = [
   {year:2023,total:23,bakers:8,butchers:1,confectioners:5,brewers:6,others:3},
 ];
 
-// Glass/paper/ceramic crafts (growing sector)
 const GLASS_CRAFT = [
   {year:2010,total:70,glassmakers:12,paperhangers:5,photographers:23,instrument:11,toymakers:5,potters:6,others:8},
   {year:2013,total:96,glassmakers:13,paperhangers:7,photographers:44,instrument:12,toymakers:5,potters:5,others:10},
@@ -229,7 +216,6 @@ const GLASS_CRAFT = [
   {year:2023,total:105,glassmakers:12,paperhangers:2,photographers:64,instrument:8,toymakers:3,potters:6,others:10},
 ];
 
-// Craft sector pie 2023
 const CRAFT_PIE_2023 = [
   {name:"Construction/Expansion", value:445, color:C.yellow},
   {name:"Electrical/Metal",        value:508, color:C.cyan},
@@ -240,8 +226,6 @@ const CRAFT_PIE_2023 = [
   {name:"Clothing/Textiles",       value:100, color:C.teal},
 ];
 
-// Handwerkskammer registration types 2017-2020
-// var2=chamber-district-total, var3=city-Magdeburg, var4=new-registrations, var5=de-registrations
 const CRAFT_REGISTRATIONS = [
   {year:2017,districtTotal:6178,cityTotal:878,newReg:1462,deReg:318},
   {year:2018,districtTotal:5836,cityTotal:830,newReg:1370,deReg:286},
@@ -249,7 +233,6 @@ const CRAFT_REGISTRATIONS = [
   {year:2020,districtTotal:7006,cityTotal:1061,newReg:675,deReg:161},
 ];
 
-// IHK vs Handwerk combined comparison 2018-2023
 const IHK_VS_CRAFT = [
   {year:2018,ihkTotal:13625,craftTotal:2111},
   {year:2019,ihkTotal:13426,craftTotal:2097},
@@ -259,9 +242,6 @@ const IHK_VS_CRAFT = [
   {year:2023,ihkTotal:12745,craftTotal:1897},
 ];
 
-// ── NEW: Consumer Advisory (Verbraucherzentrale) ──────────────────────────────
-// var1=year, var2=totalConsultations, var3=inPerson, var4=phone, var5=online,
-// var6=groupConsultations, var7=publications, var8=lectures, var9=mediaContacts, var10=totalContacts
 const CONSUMER_ADVISORY = [
   {year:2013,total:13010,inPerson:5163,phone:7835,online:12,groups:53,publications:51,lectures:875,media:65,contacts:24586},
   {year:2014,total:10648,inPerson:5431,phone:5204,online:13,groups:39,publications:29,lectures:441,media:67,contacts:25716},
@@ -364,570 +344,589 @@ export default function EconomyDashboard(){
   const GRID3 = {display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16,marginBottom:16};
 
   return(
-    <div style={{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"Inter,system-ui,sans-serif"}}>
+    <div className="bg-[#f8fafc] min-h-screen">
 
-      {/* ── Header ── */}
-      <div style={{background:"#0c1526",borderBottom:`1px solid ${C.border}`,padding:"14px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <div style={{width:36,height:36,borderRadius:8,background:"#1d4ed8",display:"flex",alignItems:"center",justifyContent:"center"}}><Building2 size={18} color="white"/></div>
+      {/* ── Light Page Header (matches Climate / Safety / Housing) ── */}
+      <div className="bg-white border-b border-gray-200 px-6 py-5">
+        <div className="max-w-7xl mx-auto flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+            <Building2 size={24} className="text-blue-600" />
+          </div>
           <div>
-            <div style={{fontSize:15,fontWeight:700,color:"white"}}>Economy, Industry & Crafts</div>
-            <div style={{fontSize:10,color:C.blue}}>Magdeburg · IHK · Handwerkskammer · Statistisches Amt · Verbraucherzentrale</div>
+            <h1 className="text-2xl font-bold text-gray-900">Economy — Magdeburg</h1>
+            <p className="text-sm text-gray-500 mt-0.5">
+              IHK · Handwerkskammer · Statistisches Amt · Verbraucherzentrale
+            </p>
           </div>
         </div>
-        <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-          {[
-            {icon:Building2,  val:latestIHK.total.toLocaleString(),     label:"IHK Companies",  c:C.blue},
-            {icon:Wrench,     val:latestCraft.total.toLocaleString(),    label:"Craft Firms",    c:C.yellow},
-            {icon:Factory,    val:latestMFG.plants.toString(),           label:"Mfg Plants",     c:C.orange},
-            {icon:HeartHandshake, val:latestCons.total.toLocaleString(), label:"Consultations",  c:C.pink},
-          ].map(k=>(
-            <div key={k.label} style={{display:"flex",alignItems:"center",gap:4,background:"rgba(255,255,255,0.05)",border:`1px solid ${C.border}`,borderRadius:16,padding:"3px 10px"}}>
-              <k.icon size={10} color={k.c}/>
-              <span style={{fontSize:12,fontWeight:700,color:"white"}}>{k.val}</span>
-              <span style={{fontSize:9,color:C.muted}}>{k.label}</span>
+      </div>
+
+      {/* ── Dark Dashboard ── */}
+      <div style={{background:C.bg,color:C.text,fontFamily:"Inter,system-ui,sans-serif"}}>
+
+        {/* ── Inner Header ── */}
+        <div style={{background:"#0c1526",borderBottom:`1px solid ${C.border}`,padding:"14px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:36,height:36,borderRadius:8,background:"#1d4ed8",display:"flex",alignItems:"center",justifyContent:"center"}}><Building2 size={18} color="white"/></div>
+            <div>
+              <div style={{fontSize:15,fontWeight:700,color:"white"}}>Economy, Industry & Crafts</div>
+              <div style={{fontSize:10,color:C.blue}}>Magdeburg · IHK · Handwerkskammer · Statistisches Amt · Verbraucherzentrale</div>
             </div>
-          ))}
+          </div>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+            {[
+              {icon:Building2,  val:latestIHK.total.toLocaleString(),     label:"IHK Companies",  c:C.blue},
+              {icon:Wrench,     val:latestCraft.total.toLocaleString(),    label:"Craft Firms",    c:C.yellow},
+              {icon:Factory,    val:latestMFG.plants.toString(),           label:"Mfg Plants",     c:C.orange},
+              {icon:HeartHandshake, val:latestCons.total.toLocaleString(), label:"Consultations",  c:C.pink},
+            ].map(k=>(
+              <div key={k.label} style={{display:"flex",alignItems:"center",gap:4,background:"rgba(255,255,255,0.05)",border:`1px solid ${C.border}`,borderRadius:16,padding:"3px 10px"}}>
+                <k.icon size={10} color={k.c}/>
+                <span style={{fontSize:12,fontWeight:700,color:"white"}}>{k.val}</span>
+                <span style={{fontSize:9,color:C.muted}}>{k.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* ── Tab Bar ── */}
-      <div style={{background:"#0c1526",borderBottom:`1px solid ${C.border}`,padding:"0 24px",display:"flex",gap:2,overflowX:"auto"}}>
-        {TABS.map(t=>{
-          const active=tab===t.id;
-          return(
-            <button key={t.id} onClick={()=>setTab(t.id)}
-              style={{padding:"11px 16px",fontSize:12,fontWeight:active?700:500,background:"transparent",border:"none",borderBottom:active?`2px solid ${C.blue}`:"2px solid transparent",color:active?C.blue:C.muted,cursor:"pointer",transition:"all 0.15s",whiteSpace:"nowrap"}}>
-              {t.label}
-            </button>
-          );
-        })}
-      </div>
+        {/* ── Tab Bar ── */}
+        <div style={{background:"#0c1526",borderBottom:`1px solid ${C.border}`,padding:"0 24px",display:"flex",gap:2,overflowX:"auto"}}>
+          {TABS.map(t=>{
+            const active=tab===t.id;
+            return(
+              <button key={t.id} onClick={()=>setTab(t.id)}
+                style={{padding:"11px 16px",fontSize:12,fontWeight:active?700:500,background:"transparent",border:"none",borderBottom:active?`2px solid ${C.blue}`:"2px solid transparent",color:active?C.blue:C.muted,cursor:"pointer",transition:"all 0.15s",whiteSpace:"nowrap"}}>
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
 
-      {/* ── Content ── */}
-      {mounted&&(
-        <div style={{padding:"28px 24px",maxWidth:1400,margin:"0 auto",animation:"fadeIn 0.35s ease"}}>
+        {/* ── Content ── */}
+        {mounted&&(
+          <div style={{padding:"28px 24px",maxWidth:1400,margin:"0 auto",animation:"fadeIn 0.35s ease"}}>
 
-          {/* ══════════════ OVERVIEW ══════════════ */}
-          {tab==="overview"&&(
-            <>
-              <SectionTitle icon={Building2} title="Magdeburg Economy at a Glance" subtitle="Snapshot 2023 · Source: IHK, Handwerkskammer & Statistisches Amt" color={C.blue}/>
-              <div style={GRID}>
-                <StatCard icon={Building2}   value={latestIHK.total.toLocaleString()}   label="Total IHK Companies"  sub="2023" delta="-880 vs 2018" color={C.blue}/>
-                <StatCard icon={Wrench}      value={latestCraft.total.toLocaleString()} label="Craft Businesses"     sub="2023" delta="-532 vs 2010" color={C.yellow}/>
-                <StatCard icon={Factory}     value={latestIHK.manufacturing.toLocaleString()} label="Manufacturing Firms" sub="2023" color={C.orange}/>
-                <StatCard icon={ShoppingCart} value={latestIHK.trade.toLocaleString()} label="Trade Companies"      sub="2023" color={C.green}/>
-                <StatCard icon={Hammer}      value={latestCraft.construction.toString()} label="Build Crafts 2023"   sub="Bau+Ausbau" delta="-198 vs 2010" color={C.teal}/>
-                <StatCard icon={HeartHandshake} value={latestCons.total.toLocaleString()} label="Advisory Sessions"  sub="Verbraucherzentrale 2021" color={C.pink}/>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="🏙️ IHK Company Trend 2018–2023" height={260}>
+            {/* ══════════════ OVERVIEW ══════════════ */}
+            {tab==="overview"&&(
+              <>
+                <SectionTitle icon={Building2} title="Magdeburg Economy at a Glance" subtitle="Snapshot 2023 · Source: IHK, Handwerkskammer & Statistisches Amt" color={C.blue}/>
+                <div style={GRID}>
+                  <StatCard icon={Building2}   value={latestIHK.total.toLocaleString()}   label="Total IHK Companies"  sub="2023" delta="-880 vs 2018" color={C.blue}/>
+                  <StatCard icon={Wrench}      value={latestCraft.total.toLocaleString()} label="Craft Businesses"     sub="2023" delta="-532 vs 2010" color={C.yellow}/>
+                  <StatCard icon={Factory}     value={latestIHK.manufacturing.toLocaleString()} label="Manufacturing Firms" sub="2023" color={C.orange}/>
+                  <StatCard icon={ShoppingCart} value={latestIHK.trade.toLocaleString()} label="Trade Companies"      sub="2023" color={C.green}/>
+                  <StatCard icon={Hammer}      value={latestCraft.construction.toString()} label="Build Crafts 2023"   sub="Bau+Ausbau" delta="-198 vs 2010" color={C.teal}/>
+                  <StatCard icon={HeartHandshake} value={latestCons.total.toLocaleString()} label="Advisory Sessions"  sub="Verbraucherzentrale 2021" color={C.pink}/>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="🏙️ IHK Company Trend 2018–2023" height={260}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={IHK_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <defs><linearGradient id="gTot" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue} stopOpacity={0.3}/><stop offset="95%" stopColor={C.blue} stopOpacity={0}/></linearGradient></defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis domain={[12000,14000]} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Area type="monotone" dataKey="total" name="IHK Total" stroke={C.blue} strokeWidth={2.5} fill="url(#gTot)" isAnimationActive animationDuration={1000}/>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="🔧 Craft Businesses vs IHK Companies 2018–2023" height={260}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={IHK_VS_CRAFT} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
+                        <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Bar  yAxisId="left"  dataKey="ihkTotal"   name="IHK Companies" fill={C.blue}   radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
+                        <Line yAxisId="right" dataKey="craftTotal" name="Craft Firms"   stroke={C.yellow} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1000}/>
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="🥧 IHK Sector Mix — 2023" height={280}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={SECTOR_PIE_2023} cx="50%" cy="50%" innerRadius="45%" outerRadius="72%" paddingAngle={2} dataKey="value" nameKey="name" isAnimationActive animationDuration={900} animationBegin={200}>
+                          {SECTOR_PIE_2023.map((e,i)=>(<Cell key={i} fill={e.color} stroke={C.bg} strokeWidth={2}/>))}
+                        </Pie>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="🔧 Craft Sector Mix — 2023" height={280}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={CRAFT_PIE_2023} cx="50%" cy="50%" innerRadius="45%" outerRadius="72%" paddingAngle={2} dataKey="value" nameKey="name" isAnimationActive animationDuration={900} animationBegin={300}>
+                          {CRAFT_PIE_2023.map((e,i)=>(<Cell key={i} fill={e.color} stroke={C.bg} strokeWidth={2}/>))}
+                        </Pie>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+              </>
+            )}
+
+            {/* ══════════════ IHK COMPANIES ══════════════ */}
+            {tab==="companies"&&(
+              <>
+                <SectionTitle icon={BarChart2} title="IHK Companies by Sector 2018–2023" subtitle="Source: IHK Magdeburg · Includes manufacturing sub-branches and trade breakdown" color={C.purple}/>
+                <div style={GRID}>
+                  <StatCard icon={ShoppingCart} value="2,726" label="Trade Total 2023"  sub="Wholesale + Retail + Auto" delta="-188 vs 2018" color={C.green}/>
+                  <StatCard icon={ShoppingCart} value="1,851" label="Wholesale 2023"    sub="67.9% of trade" color={C.blue}/>
+                  <StatCard icon={ShoppingCart} value="581"   label="Retail 2023"       delta="-81 vs 2018" color={C.orange}/>
+                  <StatCard icon={Hammer}       value="504"   label="Construction 2023" sub="IHK firms" delta="-120 vs 2018" color={C.yellow}/>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="🛒 Trade Sub-Sectors 2018–2023" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={TRADE_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <defs>
+                          {([["gW",C.blue],["gR",C.orange],["gA",C.green]] as [string,string][]).map(([id,c])=>(
+                            <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={c} stopOpacity={0.3}/><stop offset="95%" stopColor={c} stopOpacity={0}/></linearGradient>
+                          ))}
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Area type="monotone" dataKey="wholesale"  name="Wholesale"  stroke={C.blue}   strokeWidth={2} fill="url(#gW)" isAnimationActive animationDuration={900}/>
+                        <Area type="monotone" dataKey="retail"     name="Retail"     stroke={C.orange}  strokeWidth={2} fill="url(#gR)" isAnimationActive animationDuration={1000}/>
+                        <Area type="monotone" dataKey="automotive" name="Automotive" stroke={C.green}  strokeWidth={2} fill="url(#gA)" isAnimationActive animationDuration={1100}/>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="🏗️ Construction Sub-Sectors 2018–2023" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={CONSTRUCTION_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Bar dataKey="other"     name="General"    fill={C.yellow} stackId="a" isAnimationActive animationDuration={800}/>
+                        <Bar dataKey="civil"     name="Civil Eng." fill={C.blue}   stackId="a" isAnimationActive animationDuration={900}/>
+                        <Bar dataKey="finishing" name="Finishing"  fill={C.orange} stackId="a" radius={[4,4,0,0]} isAnimationActive animationDuration={1000}/>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+                <ChartCard title="🕷️ Manufacturing Sub-Sectors — Company Count Radar (2023)" height={320}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={IHK_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <defs><linearGradient id="gTot" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue} stopOpacity={0.3}/><stop offset="95%" stopColor={C.blue} stopOpacity={0}/></linearGradient></defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis domain={[12000,14000]} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
+                    <RadarChart data={MFG_RADAR} margin={{top:10,right:30,left:30,bottom:10}}>
+                      <PolarGrid stroke="#21262d"/>
+                      <PolarAngleAxis dataKey="sector" tick={{fill:C.muted,fontSize:10}}/>
+                      <Radar name="Companies" dataKey="value" stroke={C.orange} fill={C.orange} fillOpacity={0.25} isAnimationActive animationDuration={900}/>
                       <Tooltip content={<DarkTooltip/>}/>
-                      <Area type="monotone" dataKey="total" name="IHK Total" stroke={C.blue} strokeWidth={2.5} fill="url(#gTot)" isAnimationActive animationDuration={1000}/>
-                    </AreaChart>
+                    </RadarChart>
                   </ResponsiveContainer>
                 </ChartCard>
-                <ChartCard title="🔧 Craft Businesses vs IHK Companies 2018–2023" height={260}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={IHK_VS_CRAFT} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
-                      <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Bar  yAxisId="left"  dataKey="ihkTotal"   name="IHK Companies" fill={C.blue}   radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
-                      <Line yAxisId="right" dataKey="craftTotal" name="Craft Firms"   stroke={C.yellow} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1000}/>
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="🥧 IHK Sector Mix — 2023" height={280}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={SECTOR_PIE_2023} cx="50%" cy="50%" innerRadius="45%" outerRadius="72%" paddingAngle={2} dataKey="value" nameKey="name" isAnimationActive animationDuration={900} animationBegin={200}>
-                        {SECTOR_PIE_2023.map((e,i)=>(<Cell key={i} fill={e.color} stroke={C.bg} strokeWidth={2}/>))}
-                      </Pie>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-                <ChartCard title="🔧 Craft Sector Mix — 2023" height={280}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={CRAFT_PIE_2023} cx="50%" cy="50%" innerRadius="45%" outerRadius="72%" paddingAngle={2} dataKey="value" nameKey="name" isAnimationActive animationDuration={900} animationBegin={300}>
-                        {CRAFT_PIE_2023.map((e,i)=>(<Cell key={i} fill={e.color} stroke={C.bg} strokeWidth={2}/>))}
-                      </Pie>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-            </>
-          )}
+              </>
+            )}
 
-          {/* ══════════════ IHK COMPANIES ══════════════ */}
-          {tab==="companies"&&(
-            <>
-              <SectionTitle icon={BarChart2} title="IHK Companies by Sector 2018–2023" subtitle="Source: IHK Magdeburg · Includes manufacturing sub-branches and trade breakdown" color={C.purple}/>
-              <div style={GRID}>
-                <StatCard icon={ShoppingCart} value="2,726" label="Trade Total 2023"  sub="Wholesale + Retail + Auto" delta="-188 vs 2018" color={C.green}/>
-                <StatCard icon={ShoppingCart} value="1,851" label="Wholesale 2023"    sub="67.9% of trade" color={C.blue}/>
-                <StatCard icon={ShoppingCart} value="581"   label="Retail 2023"       delta="-81 vs 2018" color={C.orange}/>
-                <StatCard icon={Hammer}       value="504"   label="Construction 2023" sub="IHK firms" delta="-120 vs 2018" color={C.yellow}/>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="🛒 Trade Sub-Sectors 2018–2023" height={270}>
+            {/* ══════════════ MANUFACTURING ══════════════ */}
+            {tab==="manufacturing"&&(
+              <>
+                <SectionTitle icon={Factory} title="Manufacturing Sector — Magdeburg 2009–2021" subtitle="Plants ≥20 employees · Source: Statistisches Amt · Wages in k€, Turnover in k€" color={C.orange}/>
+                <div style={GRID}>
+                  <StatCard icon={Factory}     value="70"     label="Plants 2021" sub="≥20 employees" delta="-12 vs 2009" color={C.orange}/>
+                  <StatCard icon={Users}       value="6,190"  label="Employees 2021" delta="-854 vs 2012 peak" color={C.blue}/>
+                  <StatCard icon={Euro}        value="€236M"  label="Total Wages 2021" sub="k€ 236,164" color={C.green}/>
+                  <StatCard icon={TrendingUp}  value="€1.40B" label="Turnover 2021" sub="k€ 1,398,251" color={C.yellow}/>
+                  <StatCard icon={Activity}    value="39"     label="Plants ≥50 (peak)" sub="2009–2011" color={C.purple}/>
+                  <StatCard icon={ChevronRight} value="36%"   label="Export share 2020" sub="highest recorded" color={C.teal}/>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="🏭 Plants & Employees (≥20) 2009–2021" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={MFG_ANNUAL} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Bar  yAxisId="right" dataKey="plants"  name="Plants"    fill={C.orange} radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
+                        <Line yAxisId="left"  dataKey="persons" name="Employees" stroke={C.blue} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1000}/>
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="💶 Wages vs Turnover (≥20) 2009–2021 (k€M)" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={MFG_ANNUAL} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <defs>
+                          <linearGradient id="gT" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.yellow} stopOpacity={0.25}/><stop offset="95%" stopColor={C.yellow} stopOpacity={0}/></linearGradient>
+                          <linearGradient id="gW2" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.green} stopOpacity={0.2}/><stop offset="95%" stopColor={C.green} stopOpacity={0}/></linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tickFormatter={v=>Math.round(v/1000)+"M"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Area type="monotone" dataKey="turnover" name="Turnover" stroke={C.yellow} strokeWidth={2.5} fill="url(#gT)" isAnimationActive animationDuration={1000}/>
+                        <Area type="monotone" dataKey="wages"    name="Wages"    stroke={C.green}  strokeWidth={2}   fill="url(#gW2)" isAnimationActive animationDuration={900}/>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+                <ChartCard title="📦 Domestic vs Export Turnover — ≥50 employees 2009–2021 (k€)" height={280}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={TRADE_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
+                    <AreaChart data={MFG50_ANNUAL} margin={{top:5,right:10,left:0,bottom:5}}>
                       <defs>
-                        {([["gW",C.blue],["gR",C.orange],["gA",C.green]] as [string,string][]).map(([id,c])=>(
-                          <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={c} stopOpacity={0.3}/><stop offset="95%" stopColor={c} stopOpacity={0}/></linearGradient>
-                        ))}
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Area type="monotone" dataKey="wholesale"  name="Wholesale"  stroke={C.blue}   strokeWidth={2} fill="url(#gW)" isAnimationActive animationDuration={900}/>
-                      <Area type="monotone" dataKey="retail"     name="Retail"     stroke={C.orange}  strokeWidth={2} fill="url(#gR)" isAnimationActive animationDuration={1000}/>
-                      <Area type="monotone" dataKey="automotive" name="Automotive" stroke={C.green}  strokeWidth={2} fill="url(#gA)" isAnimationActive animationDuration={1100}/>
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-                <ChartCard title="🏗️ Construction Sub-Sectors 2018–2023" height={270}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={CONSTRUCTION_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Bar dataKey="other"     name="General"    fill={C.yellow} stackId="a" isAnimationActive animationDuration={800}/>
-                      <Bar dataKey="civil"     name="Civil Eng." fill={C.blue}   stackId="a" isAnimationActive animationDuration={900}/>
-                      <Bar dataKey="finishing" name="Finishing"  fill={C.orange} stackId="a" radius={[4,4,0,0]} isAnimationActive animationDuration={1000}/>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-              <ChartCard title="🕷️ Manufacturing Sub-Sectors — Company Count Radar (2023)" height={320}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={MFG_RADAR} margin={{top:10,right:30,left:30,bottom:10}}>
-                    <PolarGrid stroke="#21262d"/>
-                    <PolarAngleAxis dataKey="sector" tick={{fill:C.muted,fontSize:10}}/>
-                    <Radar name="Companies" dataKey="value" stroke={C.orange} fill={C.orange} fillOpacity={0.25} isAnimationActive animationDuration={900}/>
-                    <Tooltip content={<DarkTooltip/>}/>
-                  </RadarChart>
-                </ResponsiveContainer>
-              </ChartCard>
-            </>
-          )}
-
-          {/* ══════════════ MANUFACTURING ══════════════ */}
-          {tab==="manufacturing"&&(
-            <>
-              <SectionTitle icon={Factory} title="Manufacturing Sector — Magdeburg 2009–2021" subtitle="Plants ≥20 employees · Source: Statistisches Amt · Wages in k€, Turnover in k€" color={C.orange}/>
-              <div style={GRID}>
-                <StatCard icon={Factory}     value="70"     label="Plants 2021" sub="≥20 employees" delta="-12 vs 2009" color={C.orange}/>
-                <StatCard icon={Users}       value="6,190"  label="Employees 2021" delta="-854 vs 2012 peak" color={C.blue}/>
-                <StatCard icon={Euro}        value="€236M"  label="Total Wages 2021" sub="k€ 236,164" color={C.green}/>
-                <StatCard icon={TrendingUp}  value="€1.40B" label="Turnover 2021" sub="k€ 1,398,251" color={C.yellow}/>
-                <StatCard icon={Activity}    value="39"     label="Plants ≥50 (peak)" sub="2009–2011" color={C.purple}/>
-                <StatCard icon={ChevronRight} value="36%"   label="Export share 2020" sub="highest recorded" color={C.teal}/>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="🏭 Plants & Employees (≥20) 2009–2021" height={270}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={MFG_ANNUAL} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Bar  yAxisId="right" dataKey="plants"  name="Plants"    fill={C.orange} radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
-                      <Line yAxisId="left"  dataKey="persons" name="Employees" stroke={C.blue} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1000}/>
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-                <ChartCard title="💶 Wages vs Turnover (≥20) 2009–2021 (k€M)" height={270}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={MFG_ANNUAL} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <defs>
-                        <linearGradient id="gT" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.yellow} stopOpacity={0.25}/><stop offset="95%" stopColor={C.yellow} stopOpacity={0}/></linearGradient>
-                        <linearGradient id="gW2" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.green} stopOpacity={0.2}/><stop offset="95%" stopColor={C.green} stopOpacity={0}/></linearGradient>
+                        <linearGradient id="gDom" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue} stopOpacity={0.3}/><stop offset="95%" stopColor={C.blue} stopOpacity={0}/></linearGradient>
+                        <linearGradient id="gExp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.orange} stopOpacity={0.25}/><stop offset="95%" stopColor={C.orange} stopOpacity={0}/></linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
                       <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
                       <YAxis tickFormatter={v=>Math.round(v/1000)+"M"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
                       <Tooltip content={<DarkTooltip/>}/>
                       <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Area type="monotone" dataKey="turnover" name="Turnover" stroke={C.yellow} strokeWidth={2.5} fill="url(#gT)" isAnimationActive animationDuration={1000}/>
-                      <Area type="monotone" dataKey="wages"    name="Wages"    stroke={C.green}  strokeWidth={2}   fill="url(#gW2)" isAnimationActive animationDuration={900}/>
+                      <Area type="monotone" dataKey="domestic" name="Domestic" stroke={C.blue}   strokeWidth={2.5} fill="url(#gDom)" isAnimationActive animationDuration={900}/>
+                      <Area type="monotone" dataKey="export"   name="Export"   stroke={C.orange} strokeWidth={2.5} fill="url(#gExp)" isAnimationActive animationDuration={1100}/>
                     </AreaChart>
                   </ResponsiveContainer>
                 </ChartCard>
-              </div>
-              <ChartCard title="📦 Domestic vs Export Turnover — ≥50 employees 2009–2021 (k€)" height={280}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={MFG50_ANNUAL} margin={{top:5,right:10,left:0,bottom:5}}>
-                    <defs>
-                      <linearGradient id="gDom" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue} stopOpacity={0.3}/><stop offset="95%" stopColor={C.blue} stopOpacity={0}/></linearGradient>
-                      <linearGradient id="gExp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.orange} stopOpacity={0.25}/><stop offset="95%" stopColor={C.orange} stopOpacity={0}/></linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                    <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                    <YAxis tickFormatter={v=>Math.round(v/1000)+"M"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                    <Tooltip content={<DarkTooltip/>}/>
-                    <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                    <Area type="monotone" dataKey="domestic" name="Domestic" stroke={C.blue}   strokeWidth={2.5} fill="url(#gDom)" isAnimationActive animationDuration={900}/>
-                    <Area type="monotone" dataKey="export"   name="Export"   stroke={C.orange} strokeWidth={2.5} fill="url(#gExp)" isAnimationActive animationDuration={1100}/>
-                  </AreaChart>
-                </ResponsiveContainer>
-              </ChartCard>
-            </>
-          )}
+              </>
+            )}
 
-          {/* ══════════════ INVESTMENT ══════════════ */}
-          {tab==="investment"&&(
-            <>
-              <SectionTitle icon={Euro} title="Capital Investment — Manufacturing 2009–2020" subtitle="Plants ≥20 employees · Source: Statistisches Amt · All values in k€" color={C.yellow}/>
-              <div style={GRID}>
-                <StatCard icon={Euro}       value="€160M" label="Peak Investment"  sub="2012 (k€ 160,280)" color={C.yellow}/>
-                <StatCard icon={TrendingUp} value="€35M"  label="Investment 2020"  sub="k€ 35,221" delta="-78% vs 2012" color={C.red}/>
-                <StatCard icon={Building2}  value="69%"   label="Buildings share"  sub="2020 (€24M of €35M)" color={C.blue}/>
-                <StatCard icon={Activity}   value="€5,676" label="Invest/Employee" sub="2020 (k€)" color={C.purple}/>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="💶 Total Investment 2009–2020 (k€)" height={270}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={INVEST_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis tickFormatter={v=>Math.round(v/1000)+"M"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Bar dataKey="buildings" name="Buildings"  fill={C.blue}   stackId="a" isAnimationActive animationDuration={800}/>
-                      <Bar dataKey="equipment" name="Equipment"  fill={C.yellow} stackId="a" radius={[4,4,0,0]} isAnimationActive animationDuration={900}/>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-                <ChartCard title="👤 Investment per Employee (k€) 2009–2020" height={270}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={INVEST_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <defs><linearGradient id="gPP" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.purple} stopOpacity={0.35}/><stop offset="95%" stopColor={C.purple} stopOpacity={0}/></linearGradient></defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>"€"+v.toLocaleString()}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Area type="monotone" dataKey="perPerson" name="k€/Employee" stroke={C.purple} strokeWidth={2.5} fill="url(#gPP)" isAnimationActive animationDuration={1000}/>
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-            </>
-          )}
+            {/* ══════════════ INVESTMENT ══════════════ */}
+            {tab==="investment"&&(
+              <>
+                <SectionTitle icon={Euro} title="Capital Investment — Manufacturing 2009–2020" subtitle="Plants ≥20 employees · Source: Statistisches Amt · All values in k€" color={C.yellow}/>
+                <div style={GRID}>
+                  <StatCard icon={Euro}       value="€160M" label="Peak Investment"  sub="2012 (k€ 160,280)" color={C.yellow}/>
+                  <StatCard icon={TrendingUp} value="€35M"  label="Investment 2020"  sub="k€ 35,221" delta="-78% vs 2012" color={C.red}/>
+                  <StatCard icon={Building2}  value="69%"   label="Buildings share"  sub="2020 (€24M of €35M)" color={C.blue}/>
+                  <StatCard icon={Activity}   value="€5,676" label="Invest/Employee" sub="2020 (k€)" color={C.purple}/>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="💶 Total Investment 2009–2020 (k€)" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={INVEST_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tickFormatter={v=>Math.round(v/1000)+"M"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Bar dataKey="buildings" name="Buildings"  fill={C.blue}   stackId="a" isAnimationActive animationDuration={800}/>
+                        <Bar dataKey="equipment" name="Equipment"  fill={C.yellow} stackId="a" radius={[4,4,0,0]} isAnimationActive animationDuration={900}/>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="👤 Investment per Employee (k€) 2009–2020" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={INVEST_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <defs><linearGradient id="gPP" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.purple} stopOpacity={0.35}/><stop offset="95%" stopColor={C.purple} stopOpacity={0}/></linearGradient></defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>"€"+v.toLocaleString()}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Area type="monotone" dataKey="perPerson" name="k€/Employee" stroke={C.purple} strokeWidth={2.5} fill="url(#gPP)" isAnimationActive animationDuration={1000}/>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+              </>
+            )}
 
-          {/* ══════════════ ENERGY ══════════════ */}
-          {tab==="energy"&&(
-            <>
-              <SectionTitle icon={Zap} title="Energy & Industrial Power — Magdeburg" subtitle="Manufacturing electricity balance 2013–2021 · Energy & Water Supply sector 2005–2021" color={C.teal}/>
-              <div style={GRID}>
-                <StatCard icon={Zap}         value="162 GWh" label="Consumed 2021"           sub="MWh 162,089" delta="-18% vs 2013" color={C.yellow}/>
-                <StatCard icon={Activity}    value="150 GWh" label="Generated 2021"          sub="MWh 149,558" color={C.green}/>
-                <StatCard icon={TrendingUp}  value="-8%"     label="Power surplus era"       sub="2013–2015 surplus" color={C.blue}/>
-                <StatCard icon={Users}       value="930"     label="Energy Sector Employees" sub="2021 (−196 vs 2005)" color={C.orange}/>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="⚡ Manufacturing Electricity Balance 2013–2021 (MWh)" height={280}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={ENERGY_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <defs>
-                        <linearGradient id="gCon" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.orange} stopOpacity={0.25}/><stop offset="95%" stopColor={C.orange} stopOpacity={0}/></linearGradient>
-                        <linearGradient id="gGen" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.green} stopOpacity={0.25}/><stop offset="95%" stopColor={C.green} stopOpacity={0}/></linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis tickFormatter={v=>Math.round(v/1000)+"k"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Area type="monotone" dataKey="generated" name="Generated (MWh)" stroke={C.green}  strokeWidth={2.5} fill="url(#gGen)" isAnimationActive animationDuration={900}/>
-                      <Area type="monotone" dataKey="consumed"  name="Consumed (MWh)"  stroke={C.orange} strokeWidth={2}   fill="url(#gCon)" isAnimationActive animationDuration={800}/>
-                      <Area type="monotone" dataKey="grid"      name="Grid Use (MWh)"   stroke={C.blue}  strokeWidth={2}   fill="none" strokeDasharray="5 3" isAnimationActive animationDuration={1000}/>
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-                <ChartCard title="💧 Energy & Water Supply — Employees & Revenue 2005–2021" height={280}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={ENERGY_SUPPLY} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:10}} tickLine={false}/>
-                      <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>Math.round(v/1000)+"M"}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Bar  yAxisId="right" dataKey="revenue"   name="Revenue (k€)" fill={C.teal}   radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
-                      <Line yAxisId="left"  dataKey="employees" name="Employees"     stroke={C.orange} strokeWidth={2.5} dot={{r:2}} isAnimationActive animationDuration={1000}/>
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-            </>
-          )}
+            {/* ══════════════ ENERGY ══════════════ */}
+            {tab==="energy"&&(
+              <>
+                <SectionTitle icon={Zap} title="Energy & Industrial Power — Magdeburg" subtitle="Manufacturing electricity balance 2013–2021 · Energy & Water Supply sector 2005–2021" color={C.teal}/>
+                <div style={GRID}>
+                  <StatCard icon={Zap}         value="162 GWh" label="Consumed 2021"           sub="MWh 162,089" delta="-18% vs 2013" color={C.yellow}/>
+                  <StatCard icon={Activity}    value="150 GWh" label="Generated 2021"          sub="MWh 149,558" color={C.green}/>
+                  <StatCard icon={TrendingUp}  value="-8%"     label="Power surplus era"       sub="2013–2015 surplus" color={C.blue}/>
+                  <StatCard icon={Users}       value="930"     label="Energy Sector Employees" sub="2021 (−196 vs 2005)" color={C.orange}/>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="⚡ Manufacturing Electricity Balance 2013–2021 (MWh)" height={280}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={ENERGY_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <defs>
+                          <linearGradient id="gCon" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.orange} stopOpacity={0.25}/><stop offset="95%" stopColor={C.orange} stopOpacity={0}/></linearGradient>
+                          <linearGradient id="gGen" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.green} stopOpacity={0.25}/><stop offset="95%" stopColor={C.green} stopOpacity={0}/></linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tickFormatter={v=>Math.round(v/1000)+"k"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Area type="monotone" dataKey="generated" name="Generated (MWh)" stroke={C.green}  strokeWidth={2.5} fill="url(#gGen)" isAnimationActive animationDuration={900}/>
+                        <Area type="monotone" dataKey="consumed"  name="Consumed (MWh)"  stroke={C.orange} strokeWidth={2}   fill="url(#gCon)" isAnimationActive animationDuration={800}/>
+                        <Area type="monotone" dataKey="grid"      name="Grid Use (MWh)"   stroke={C.blue}  strokeWidth={2}   fill="none" strokeDasharray="5 3" isAnimationActive animationDuration={1000}/>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="💧 Energy & Water Supply — Employees & Revenue 2005–2021" height={280}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={ENERGY_SUPPLY} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:10}} tickLine={false}/>
+                        <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>Math.round(v/1000)+"M"}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Bar  yAxisId="right" dataKey="revenue"   name="Revenue (k€)" fill={C.teal}   radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
+                        <Line yAxisId="left"  dataKey="employees" name="Employees"     stroke={C.orange} strokeWidth={2.5} dot={{r:2}} isAnimationActive animationDuration={1000}/>
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+              </>
+            )}
 
-          {/* ══════════════ TRADE ══════════════ */}
-          {tab==="trade"&&(
-            <>
-              <SectionTitle icon={ShoppingCart} title="Trade & Commerce — IHK Magdeburg 2018–2023" subtitle="Wholesale · Retail · Automotive · Construction detail" color={C.green}/>
-              <div style={GRID}>
-                <StatCard icon={ShoppingCart} value="2,726" label="Trade Total 2023"  delta="-6.4% vs 2018" color={C.green}/>
-                <StatCard icon={TrendingUp}   value="67.9%" label="Wholesale Share"   sub="1,851 of 2,726 firms" color={C.blue}/>
-                <StatCard icon={ShoppingCart} value="294"   label="Automotive 2023"   sub="Dealerships + service" delta="-8.1% vs 2018" color={C.orange}/>
-                <StatCard icon={Building2}    value="504"   label="Construction 2023" sub="IHK members" delta="-19.2% vs 2018" color={C.yellow}/>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="🛒 Trade Companies 2018–2023 — 3 Sub-Sectors" height={270}>
+            {/* ══════════════ TRADE ══════════════ */}
+            {tab==="trade"&&(
+              <>
+                <SectionTitle icon={ShoppingCart} title="Trade & Commerce — IHK Magdeburg 2018–2023" subtitle="Wholesale · Retail · Automotive · Construction detail" color={C.green}/>
+                <div style={GRID}>
+                  <StatCard icon={ShoppingCart} value="2,726" label="Trade Total 2023"  delta="-6.4% vs 2018" color={C.green}/>
+                  <StatCard icon={TrendingUp}   value="67.9%" label="Wholesale Share"   sub="1,851 of 2,726 firms" color={C.blue}/>
+                  <StatCard icon={ShoppingCart} value="294"   label="Automotive 2023"   sub="Dealerships + service" delta="-8.1% vs 2018" color={C.orange}/>
+                  <StatCard icon={Building2}    value="504"   label="Construction 2023" sub="IHK members" delta="-19.2% vs 2018" color={C.yellow}/>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="🛒 Trade Companies 2018–2023 — 3 Sub-Sectors" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={TRADE_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Line type="monotone" dataKey="wholesale"  name="Wholesale"  stroke={C.blue}   strokeWidth={2.5} dot={{r:4,fill:C.blue}}   isAnimationActive animationDuration={900}/>
+                        <Line type="monotone" dataKey="retail"     name="Retail"     stroke={C.orange}  strokeWidth={2.5} dot={{r:4,fill:C.orange}}  isAnimationActive animationDuration={1000}/>
+                        <Line type="monotone" dataKey="automotive" name="Automotive" stroke={C.green}  strokeWidth={2.5} dot={{r:4,fill:C.green}}  isAnimationActive animationDuration={1100}/>
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="🏗️ Construction Firms 2018–2023" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={CONSTRUCTION_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis yAxisId="left" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Bar  yAxisId="left" dataKey="other"     name="General"    fill={C.yellow} stackId="a" isAnimationActive animationDuration={800}/>
+                        <Bar  yAxisId="left" dataKey="civil"     name="Civil Eng." fill={C.blue}   stackId="a" isAnimationActive animationDuration={900}/>
+                        <Bar  yAxisId="left" dataKey="finishing" name="Finishing"  fill={C.orange} stackId="a" radius={[4,4,0,0]} isAnimationActive animationDuration={1000}/>
+                        <Line yAxisId="left" dataKey="total"     name="Total"      stroke={C.purple} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1100}/>
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+                <ChartCard title="📈 IHK Companies — 8 Sectors Trend Lines 2018–2023" height={300}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={TRADE_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
+                    <LineChart data={IHK_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
                       <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
                       <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
                       <Tooltip content={<DarkTooltip/>}/>
                       <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Line type="monotone" dataKey="wholesale"  name="Wholesale"  stroke={C.blue}   strokeWidth={2.5} dot={{r:4,fill:C.blue}}   isAnimationActive animationDuration={900}/>
-                      <Line type="monotone" dataKey="retail"     name="Retail"     stroke={C.orange}  strokeWidth={2.5} dot={{r:4,fill:C.orange}}  isAnimationActive animationDuration={1000}/>
-                      <Line type="monotone" dataKey="automotive" name="Automotive" stroke={C.green}  strokeWidth={2.5} dot={{r:4,fill:C.green}}  isAnimationActive animationDuration={1100}/>
+                      <Line type="monotone" dataKey="services"      name="Services"      stroke={C.blue}   strokeWidth={2} dot={false} isAnimationActive animationDuration={800}/>
+                      <Line type="monotone" dataKey="trade"         name="Trade"         stroke={C.green}  strokeWidth={2} dot={false} isAnimationActive animationDuration={850}/>
+                      <Line type="monotone" dataKey="manufacturing" name="Manufacturing" stroke={C.orange} strokeWidth={2} dot={false} isAnimationActive animationDuration={900}/>
+                      <Line type="monotone" dataKey="construction"  name="Construction"  stroke={C.yellow} strokeWidth={2} dot={false} isAnimationActive animationDuration={950}/>
+                      <Line type="monotone" dataKey="hospitality"   name="Hospitality"   stroke={C.purple} strokeWidth={2} dot={false} isAnimationActive animationDuration={1000}/>
+                      <Line type="monotone" dataKey="finance"       name="Finance"       stroke={C.teal}   strokeWidth={2} dot={false} isAnimationActive animationDuration={1050}/>
+                      <Line type="monotone" dataKey="transport"     name="Transport"     stroke={C.cyan}   strokeWidth={2} dot={false} isAnimationActive animationDuration={1100}/>
                     </LineChart>
                   </ResponsiveContainer>
                 </ChartCard>
-                <ChartCard title="🏗️ Construction Firms 2018–2023" height={270}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={CONSTRUCTION_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis yAxisId="left" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Bar  yAxisId="left" dataKey="other"     name="General"    fill={C.yellow} stackId="a" isAnimationActive animationDuration={800}/>
-                      <Bar  yAxisId="left" dataKey="civil"     name="Civil Eng." fill={C.blue}   stackId="a" isAnimationActive animationDuration={900}/>
-                      <Bar  yAxisId="left" dataKey="finishing" name="Finishing"  fill={C.orange} stackId="a" radius={[4,4,0,0]} isAnimationActive animationDuration={1000}/>
-                      <Line yAxisId="left" dataKey="total"     name="Total"      stroke={C.purple} strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1100}/>
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-              <ChartCard title="📈 IHK Companies — 8 Sectors Trend Lines 2018–2023" height={300}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={IHK_SECTORS} margin={{top:5,right:10,left:0,bottom:5}}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                    <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                    <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                    <Tooltip content={<DarkTooltip/>}/>
-                    <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                    <Line type="monotone" dataKey="services"      name="Services"      stroke={C.blue}   strokeWidth={2} dot={false} isAnimationActive animationDuration={800}/>
-                    <Line type="monotone" dataKey="trade"         name="Trade"         stroke={C.green}  strokeWidth={2} dot={false} isAnimationActive animationDuration={850}/>
-                    <Line type="monotone" dataKey="manufacturing" name="Manufacturing" stroke={C.orange} strokeWidth={2} dot={false} isAnimationActive animationDuration={900}/>
-                    <Line type="monotone" dataKey="construction"  name="Construction"  stroke={C.yellow} strokeWidth={2} dot={false} isAnimationActive animationDuration={950}/>
-                    <Line type="monotone" dataKey="hospitality"   name="Hospitality"   stroke={C.purple} strokeWidth={2} dot={false} isAnimationActive animationDuration={1000}/>
-                    <Line type="monotone" dataKey="finance"       name="Finance"       stroke={C.teal}   strokeWidth={2} dot={false} isAnimationActive animationDuration={1050}/>
-                    <Line type="monotone" dataKey="transport"     name="Transport"     stroke={C.cyan}   strokeWidth={2} dot={false} isAnimationActive animationDuration={1100}/>
-                  </LineChart>
-                </ResponsiveContainer>
-              </ChartCard>
-            </>
-          )}
+              </>
+            )}
 
-          {/* ══════════════ HANDWERK (NEW) ══════════════ */}
-          {tab==="handwerk"&&(
-            <>
-              <SectionTitle icon={Wrench} title="Crafts & Trades (Handwerk) — Magdeburg 2010–2023" subtitle="Source: Handwerkskammer Magdeburg · 7 craft sectors · 1,897 businesses in 2023" color={C.yellow}/>
-              <div style={GRID}>
-                <StatCard icon={Wrench}   value="1,897"  label="Total Craft Firms 2023" delta="-532 vs 2010" color={C.yellow}/>
-                <StatCard icon={Hammer}   value="445"    label="Build/Expand Crafts"    sub="Roofers, masons, painters…" delta="-198 vs 2010" color={C.orange}/>
-                <StatCard icon={Activity} value="570"    label="Health/Hygiene Crafts"  sub="Largest craft sector" color={C.green}/>
-                <StatCard icon={Factory}  value="508"    label="Electrical/Metal Crafts" sub="2nd largest" color={C.cyan}/>
-                <StatCard icon={BookOpen} value="146"    label="Wood/Plastics Crafts"    delta="-131 vs 2010" color={C.blue}/>
-                <StatCard icon={UtensilsCrossed} value="23" label="Food Crafts 2023"    sub="Bakers, butchers, brewers" color={C.pink}/>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="🔧 Total Craft Businesses 2010–2023" height={270}>
+            {/* ══════════════ HANDWERK ══════════════ */}
+            {tab==="handwerk"&&(
+              <>
+                <SectionTitle icon={Wrench} title="Crafts & Trades (Handwerk) — Magdeburg 2010–2023" subtitle="Source: Handwerkskammer Magdeburg · 7 craft sectors · 1,897 businesses in 2023" color={C.yellow}/>
+                <div style={GRID}>
+                  <StatCard icon={Wrench}   value="1,897"  label="Total Craft Firms 2023" delta="-532 vs 2010" color={C.yellow}/>
+                  <StatCard icon={Hammer}   value="445"    label="Build/Expand Crafts"    sub="Roofers, masons, painters…" delta="-198 vs 2010" color={C.orange}/>
+                  <StatCard icon={Activity} value="570"    label="Health/Hygiene Crafts"  sub="Largest craft sector" color={C.green}/>
+                  <StatCard icon={Factory}  value="508"    label="Electrical/Metal Crafts" sub="2nd largest" color={C.cyan}/>
+                  <StatCard icon={BookOpen} value="146"    label="Wood/Plastics Crafts"    delta="-131 vs 2010" color={C.blue}/>
+                  <StatCard icon={UtensilsCrossed} value="23" label="Food Crafts 2023"    sub="Bakers, butchers, brewers" color={C.pink}/>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="🔧 Total Craft Businesses 2010–2023" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={CRAFT_TOTAL} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <defs><linearGradient id="gCraft" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.yellow} stopOpacity={0.3}/><stop offset="95%" stopColor={C.yellow} stopOpacity={0}/></linearGradient></defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis domain={[1800,2500]} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Area type="monotone" dataKey="total" name="Total Craft Firms" stroke={C.yellow} strokeWidth={2.5} fill="url(#gCraft)" isAnimationActive animationDuration={1000}/>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="📊 Craft Sectors Stacked 2010–2023" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={CRAFT_TOTAL} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:9}} tickLine={false}/>
+                        <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:9,color:C.muted}}/>
+                        <Bar dataKey="health"       name="Health/Hygiene"    fill={C.green}  stackId="a" isAnimationActive animationDuration={700}/>
+                        <Bar dataKey="electrical"   name="Electrical/Metal" fill={C.cyan}   stackId="a" isAnimationActive animationDuration={750}/>
+                        <Bar dataKey="construction" name="Build/Expand"     fill={C.yellow} stackId="a" isAnimationActive animationDuration={800}/>
+                        <Bar dataKey="wood"         name="Wood/Plastics"    fill={C.orange} stackId="a" isAnimationActive animationDuration={850}/>
+                        <Bar dataKey="glass"        name="Glass/Photo"      fill={C.purple} stackId="a" isAnimationActive animationDuration={900}/>
+                        <Bar dataKey="clothing"     name="Clothing"         fill={C.teal}   stackId="a" isAnimationActive animationDuration={950}/>
+                        <Bar dataKey="food"         name="Food"             fill={C.pink}   stackId="a" radius={[3,3,0,0]} isAnimationActive animationDuration={1000}/>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="🏗️ Building Crafts — Key Professions 2010–2023" height={280}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={BUILD_CRAFT_DETAIL} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:9,color:C.muted}}/>
+                        <Line type="monotone" dataKey="painters"   name="Painters"    stroke={C.blue}   strokeWidth={2} dot={false} isAnimationActive animationDuration={800}/>
+                        <Line type="monotone" dataKey="groundwork" name="Groundwork"  stroke={C.yellow} strokeWidth={2} dot={false} isAnimationActive animationDuration={850}/>
+                        <Line type="monotone" dataKey="plumbers"   name="Plumbers"    stroke={C.green}  strokeWidth={2} dot={false} isAnimationActive animationDuration={900}/>
+                        <Line type="monotone" dataKey="carpenters" name="Carpenters"  stroke={C.orange} strokeWidth={2} dot={false} isAnimationActive animationDuration={950}/>
+                        <Line type="monotone" dataKey="roofers"    name="Roofers"     stroke={C.purple} strokeWidth={2} dot={false} isAnimationActive animationDuration={1000}/>
+                        <Line type="monotone" dataKey="masons"     name="Masons"      stroke={C.teal}   strokeWidth={2} dot={false} isAnimationActive animationDuration={1050}/>
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="📸 Glass/Ceramic/Photo Crafts — by Profession 2010–2023" height={280}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={GLASS_CRAFT} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <defs>
+                          <linearGradient id="gPh" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.purple} stopOpacity={0.3}/><stop offset="95%" stopColor={C.purple} stopOpacity={0}/></linearGradient>
+                          <linearGradient id="gGl" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.cyan} stopOpacity={0.2}/><stop offset="95%" stopColor={C.cyan} stopOpacity={0}/></linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:9,color:C.muted}}/>
+                        <Area type="monotone" dataKey="photographers" name="Photographers" stroke={C.purple} strokeWidth={2.5} fill="url(#gPh)" isAnimationActive animationDuration={900}/>
+                        <Area type="monotone" dataKey="glassmakers"   name="Glassmakers"   stroke={C.cyan}   strokeWidth={2}   fill="url(#gGl)" isAnimationActive animationDuration={800}/>
+                        <Line type="monotone" dataKey="potters"       name="Potters"        stroke={C.orange}  strokeWidth={1.5} dot={{r:3}} isAnimationActive animationDuration={1000}/>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+                <ChartCard title="🏢 Handwerkskammer — New vs De-Registrations 2017–2020 (Magdeburg District)" height={260}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={CRAFT_TOTAL} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <defs><linearGradient id="gCraft" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.yellow} stopOpacity={0.3}/><stop offset="95%" stopColor={C.yellow} stopOpacity={0}/></linearGradient></defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis domain={[1800,2500]} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Area type="monotone" dataKey="total" name="Total Craft Firms" stroke={C.yellow} strokeWidth={2.5} fill="url(#gCraft)" isAnimationActive animationDuration={1000}/>
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-                <ChartCard title="📊 Craft Sectors Stacked 2010–2023" height={270}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={CRAFT_TOTAL} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:9}} tickLine={false}/>
-                      <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:9,color:C.muted}}/>
-                      <Bar dataKey="health"       name="Health/Hygiene"    fill={C.green}  stackId="a" isAnimationActive animationDuration={700}/>
-                      <Bar dataKey="electrical"   name="Electrical/Metal" fill={C.cyan}   stackId="a" isAnimationActive animationDuration={750}/>
-                      <Bar dataKey="construction" name="Build/Expand"     fill={C.yellow} stackId="a" isAnimationActive animationDuration={800}/>
-                      <Bar dataKey="wood"         name="Wood/Plastics"    fill={C.orange} stackId="a" isAnimationActive animationDuration={850}/>
-                      <Bar dataKey="glass"        name="Glass/Photo"      fill={C.purple} stackId="a" isAnimationActive animationDuration={900}/>
-                      <Bar dataKey="clothing"     name="Clothing"         fill={C.teal}   stackId="a" isAnimationActive animationDuration={950}/>
-                      <Bar dataKey="food"         name="Food"             fill={C.pink}   stackId="a" radius={[3,3,0,0]} isAnimationActive animationDuration={1000}/>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="🏗️ Building Crafts — Key Professions 2010–2023" height={280}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={BUILD_CRAFT_DETAIL} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:9,color:C.muted}}/>
-                      <Line type="monotone" dataKey="painters"   name="Painters"    stroke={C.blue}   strokeWidth={2} dot={false} isAnimationActive animationDuration={800}/>
-                      <Line type="monotone" dataKey="groundwork" name="Groundwork"  stroke={C.yellow} strokeWidth={2} dot={false} isAnimationActive animationDuration={850}/>
-                      <Line type="monotone" dataKey="plumbers"   name="Plumbers"    stroke={C.green}  strokeWidth={2} dot={false} isAnimationActive animationDuration={900}/>
-                      <Line type="monotone" dataKey="carpenters" name="Carpenters"  stroke={C.orange} strokeWidth={2} dot={false} isAnimationActive animationDuration={950}/>
-                      <Line type="monotone" dataKey="roofers"    name="Roofers"     stroke={C.purple} strokeWidth={2} dot={false} isAnimationActive animationDuration={1000}/>
-                      <Line type="monotone" dataKey="masons"     name="Masons"      stroke={C.teal}   strokeWidth={2} dot={false} isAnimationActive animationDuration={1050}/>
-                    </LineChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-                <ChartCard title="📸 Glass/Ceramic/Photo Crafts — by Profession 2010–2023" height={280}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={GLASS_CRAFT} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <defs>
-                        <linearGradient id="gPh" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.purple} stopOpacity={0.3}/><stop offset="95%" stopColor={C.purple} stopOpacity={0}/></linearGradient>
-                        <linearGradient id="gGl" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.cyan} stopOpacity={0.2}/><stop offset="95%" stopColor={C.cyan} stopOpacity={0}/></linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:9,color:C.muted}}/>
-                      <Area type="monotone" dataKey="photographers" name="Photographers" stroke={C.purple} strokeWidth={2.5} fill="url(#gPh)" isAnimationActive animationDuration={900}/>
-                      <Area type="monotone" dataKey="glassmakers"   name="Glassmakers"   stroke={C.cyan}   strokeWidth={2}   fill="url(#gGl)" isAnimationActive animationDuration={800}/>
-                      <Line type="monotone" dataKey="potters"       name="Potters"        stroke={C.orange}  strokeWidth={1.5} dot={{r:3}} isAnimationActive animationDuration={1000}/>
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-              <ChartCard title="🏢 Handwerkskammer — New vs De-Registrations 2017–2020 (Magdeburg District)" height={260}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={CRAFT_REGISTRATIONS} margin={{top:5,right:10,left:0,bottom:5}}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                    <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                    <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                    <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                    <Tooltip content={<DarkTooltip/>}/>
-                    <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                    <Bar  yAxisId="left"  dataKey="newReg"       name="New Registrations" fill={C.green}  radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
-                    <Bar  yAxisId="left"  dataKey="deReg"        name="De-registrations"  fill={C.red}    radius={[3,3,0,0]} isAnimationActive animationDuration={900}/>
-                    <Line yAxisId="right" dataKey="districtTotal" name="District Total"    stroke={C.blue}   strokeWidth={2} dot={{r:4}} isAnimationActive animationDuration={1000}/>
-                    <Line yAxisId="right" dataKey="cityTotal"     name="City Total"        stroke={C.yellow} strokeWidth={2} dot={{r:4}} isAnimationActive animationDuration={1100}/>
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </ChartCard>
-            </>
-          )}
-
-          {/* ══════════════ CONSUMER ADVISORY (NEW) ══════════════ */}
-          {tab==="consumer"&&(
-            <>
-              <SectionTitle icon={HeartHandshake} title="Consumer Advisory — Verbraucherzentrale Magdeburg 2013–2021" subtitle="Sachsen-Anhalt consumer protection centre · Beratungsstelle Magdeburg · In-person, phone, online" color={C.pink}/>
-              <div style={GRID}>
-                <StatCard icon={HeartHandshake} value="12,599" label="Peak Sessions 2020"  sub="COVID boost +59% vs 2019" color={C.pink}/>
-                <StatCard icon={Users}          value="2,285"  label="In-Person 2020"      sub="-34% vs 2019" delta="COVID shift" color={C.orange}/>
-                <StatCard icon={Activity}       value="8,187"  label="Phone 2020"          sub="+86% vs 2019" delta="+3,790" color={C.green}/>
-                <StatCard icon={BookOpen}       value="2,127"  label="Online 2020"         sub="from only 290 in 2019" delta="+633%" color={C.blue}/>
-                <StatCard icon={Building2}      value="875"    label="Lectures 2013"       sub="Peak lecture year" color={C.yellow}/>
-                <StatCard icon={TrendingUp}     value="24,586" label="Total Contacts 2013" sub="Incl. media, publications" color={C.purple}/>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="🫱 Total Consultations 2013–2021" height={270}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={CONSUMER_ADVISORY} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <defs><linearGradient id="gCAdv" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.pink} stopOpacity={0.35}/><stop offset="95%" stopColor={C.pink} stopOpacity={0}/></linearGradient></defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Area type="monotone" dataKey="total" name="Total Consultations" stroke={C.pink} strokeWidth={2.5} fill="url(#gCAdv)" isAnimationActive animationDuration={1000}/>
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-                <ChartCard title="📞 Channel Mix — In-Person · Phone · Online 2013–2021" height={270}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={CONSUMER_ADVISORY} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Bar dataKey="inPerson" name="In-Person" fill={C.orange} stackId="a" isAnimationActive animationDuration={800}/>
-                      <Bar dataKey="phone"    name="Phone"     fill={C.blue}   stackId="a" isAnimationActive animationDuration={900}/>
-                      <Bar dataKey="online"   name="Online"    fill={C.green}  stackId="a" radius={[3,3,0,0]} isAnimationActive animationDuration={1000}/>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-              <div style={GRID2}>
-                <ChartCard title="🎓 Lectures & Group Consultations 2013–2021" height={240}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={CONSUMER_ADVISORY} margin={{top:5,right:10,left:0,bottom:5}}>
+                    <ComposedChart data={CRAFT_REGISTRATIONS} margin={{top:5,right:10,left:0,bottom:5}}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
                       <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
                       <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
                       <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
                       <Tooltip content={<DarkTooltip/>}/>
                       <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Bar  yAxisId="left"  dataKey="lectures" name="Lectures"            fill={C.yellow} radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
-                      <Line yAxisId="right" dataKey="groups"   name="Group Consultations" stroke={C.teal}   strokeWidth={2} dot={{r:4}} isAnimationActive animationDuration={1000}/>
+                      <Bar  yAxisId="left"  dataKey="newReg"       name="New Registrations" fill={C.green}  radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
+                      <Bar  yAxisId="left"  dataKey="deReg"        name="De-registrations"  fill={C.red}    radius={[3,3,0,0]} isAnimationActive animationDuration={900}/>
+                      <Line yAxisId="right" dataKey="districtTotal" name="District Total"    stroke={C.blue}   strokeWidth={2} dot={{r:4}} isAnimationActive animationDuration={1000}/>
+                      <Line yAxisId="right" dataKey="cityTotal"     name="City Total"        stroke={C.yellow} strokeWidth={2} dot={{r:4}} isAnimationActive animationDuration={1100}/>
                     </ComposedChart>
                   </ResponsiveContainer>
                 </ChartCard>
-                <ChartCard title="📰 Media Contacts & Total Public Reach 2013–2021" height={240}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={CONSUMER_ADVISORY} margin={{top:5,right:10,left:0,bottom:5}}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
-                      <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                      <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                      <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
-                      <Tooltip content={<DarkTooltip/>}/>
-                      <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
-                      <Bar  yAxisId="left"  dataKey="media"    name="Media Contacts"  fill={C.purple} radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
-                      <Line yAxisId="right" dataKey="contacts" name="Total Reach"      stroke={C.pink}   strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1000}/>
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </ChartCard>
-              </div>
-            </>
-          )}
+              </>
+            )}
 
-        </div>
-      )}
+            {/* ══════════════ CONSUMER ADVISORY ══════════════ */}
+            {tab==="consumer"&&(
+              <>
+                <SectionTitle icon={HeartHandshake} title="Consumer Advisory — Verbraucherzentrale Magdeburg 2013–2021" subtitle="Sachsen-Anhalt consumer protection centre · Beratungsstelle Magdeburg · In-person, phone, online" color={C.pink}/>
+                <div style={GRID}>
+                  <StatCard icon={HeartHandshake} value="12,599" label="Peak Sessions 2020"  sub="COVID boost +59% vs 2019" color={C.pink}/>
+                  <StatCard icon={Users}          value="2,285"  label="In-Person 2020"      sub="-34% vs 2019" delta="COVID shift" color={C.orange}/>
+                  <StatCard icon={Activity}       value="8,187"  label="Phone 2020"          sub="+86% vs 2019" delta="+3,790" color={C.green}/>
+                  <StatCard icon={BookOpen}       value="2,127"  label="Online 2020"         sub="from only 290 in 2019" delta="+633%" color={C.blue}/>
+                  <StatCard icon={Building2}      value="875"    label="Lectures 2013"       sub="Peak lecture year" color={C.yellow}/>
+                  <StatCard icon={TrendingUp}     value="24,586" label="Total Contacts 2013" sub="Incl. media, publications" color={C.purple}/>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="🫱 Total Consultations 2013–2021" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={CONSUMER_ADVISORY} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <defs><linearGradient id="gCAdv" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.pink} stopOpacity={0.35}/><stop offset="95%" stopColor={C.pink} stopOpacity={0}/></linearGradient></defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Area type="monotone" dataKey="total" name="Total Consultations" stroke={C.pink} strokeWidth={2.5} fill="url(#gCAdv)" isAnimationActive animationDuration={1000}/>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="📞 Channel Mix — In-Person · Phone · Online 2013–2021" height={270}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={CONSUMER_ADVISORY} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Bar dataKey="inPerson" name="In-Person" fill={C.orange} stackId="a" isAnimationActive animationDuration={800}/>
+                        <Bar dataKey="phone"    name="Phone"     fill={C.blue}   stackId="a" isAnimationActive animationDuration={900}/>
+                        <Bar dataKey="online"   name="Online"    fill={C.green}  stackId="a" radius={[3,3,0,0]} isAnimationActive animationDuration={1000}/>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+                <div style={GRID2}>
+                  <ChartCard title="🎓 Lectures & Group Consultations 2013–2021" height={240}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={CONSUMER_ADVISORY} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Bar  yAxisId="left"  dataKey="lectures" name="Lectures"            fill={C.yellow} radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
+                        <Line yAxisId="right" dataKey="groups"   name="Group Consultations" stroke={C.teal}   strokeWidth={2} dot={{r:4}} isAnimationActive animationDuration={1000}/>
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="📰 Media Contacts & Total Public Reach 2013–2021" height={240}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={CONSUMER_ADVISORY} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis yAxisId="left"  tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <YAxis yAxisId="right" orientation="right" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} tickFormatter={v=>v.toLocaleString()}/>
+                        <Tooltip content={<DarkTooltip/>}/>
+                        <Legend wrapperStyle={{fontSize:10,color:C.muted}}/>
+                        <Bar  yAxisId="left"  dataKey="media"    name="Media Contacts"  fill={C.purple} radius={[3,3,0,0]} isAnimationActive animationDuration={800}/>
+                        <Line yAxisId="right" dataKey="contacts" name="Total Reach"      stroke={C.pink}   strokeWidth={2.5} dot={{r:3}} isAnimationActive animationDuration={1000}/>
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+              </>
+            )}
 
-      <style>{`
-        @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        ::-webkit-scrollbar{display:none}
-        button:hover{color:#e6edf3 !important}
-      `}</style>
+          </div>
+        )}
+
+        <style>{`
+          @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+          ::-webkit-scrollbar{display:none}
+          button:hover{color:#e6edf3 !important}
+        `}</style>
+      </div>
     </div>
   );
 }
