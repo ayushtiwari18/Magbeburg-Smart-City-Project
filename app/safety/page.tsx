@@ -243,71 +243,109 @@ export default function Safety() {
     setTimeout(() => { setModalOpen(false); setSubmitted(false); setForm({ name: "", location: "", type: issueTypes[0], description: "" }); }, 2200);
   };
 
+  const heroStats = [
+    { icon: AlertTriangle, value: totalAccidents,     label: "Accidents",    sub: "2017–2024",    color: "#60a5fa" },
+    { icon: TrendingDown,  value: fatalities,          label: "Fatalities",   sub: "UKATEGORIE 1", color: "#f87171" },
+    { icon: Users,         value: cyclistInvolved,    label: "Cyclists",     sub: "IstRad = 1",   color: "#34d399" },
+    { icon: MapPin,        value: pedestrianInvolved, label: "Pedestrians",  sub: "IstFuss = 1",  color: "#fbbf24" },
+  ] as { icon: React.ElementType; value: number; label: string; sub: string; color: string }[];
+
   return (
     <div style={{ background: "#f1f5f9", minHeight: "100vh" }}>
 
-      {/* Hero */}
-      <section style={{ position: "relative", height: 480 }}>
-        <Image src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1600&q=85" alt="Safety" fill priority sizes="100vw" style={{ objectFit: "cover" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(120deg,#061B46ee 0%,#061B46aa 50%,transparent 100%)" }} />
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center" }}>
-          <Container>
-            <div style={{ maxWidth: 560, animation: "fadeUp 0.7s ease both" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 999, background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)", padding: "6px 16px", marginBottom: 16 }}>
-                <Shield size={14} color="#93c5fd" />
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#bfdbfe", letterSpacing: "0.1em", textTransform: "uppercase" }}>Smart City Magdeburg</span>
+      {/* ── Compact Hero (full viewport, stats inside) ── */}
+      <section style={{ position: "relative", height: "100vh", minHeight: 540, maxHeight: 780, display: "flex", flexDirection: "column" }}>
+        {/* bg image */}
+        <Image
+          src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1600&q=85"
+          alt="Safety" fill priority sizes="100vw"
+          style={{ objectFit: "cover", objectPosition: "center 30%" }}
+        />
+        {/* gradient overlay */}
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, #061B46cc 0%, #061B46bb 55%, #061B46f0 100%)" }} />
+
+        {/* content column */}
+        <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "0" }}>
+
+          {/* top: title + CTA */}
+          <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
+            <Container>
+              <div style={{ maxWidth: 620, animation: "fadeUp 0.7s ease both" }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 999, background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)", padding: "6px 16px", marginBottom: 14 }}>
+                  <Shield size={13} color="#93c5fd" />
+                  <span style={{ fontSize: 10, fontWeight: 700, color: "#bfdbfe", letterSpacing: "0.12em", textTransform: "uppercase" }}>Smart City Magdeburg</span>
+                </div>
+                <h1 style={{ fontSize: "clamp(36px, 5vw, 56px)", fontWeight: 800, color: "#fff", margin: 0, lineHeight: 1.05, letterSpacing: "-0.02em" }}>
+                  Safety Dashboard
+                </h1>
+                <p style={{ marginTop: 12, fontSize: 15, color: "#bfdbfe", lineHeight: 1.65, maxWidth: 460 }}>
+                  Real accident data from Magdeburg&#39;s Unfallatlas — 2017 to 2024 — analysed across time, location and severity.
+                </p>
+                <button
+                  onClick={() => setModalOpen(true)}
+                  style={{
+                    marginTop: 22, display: "inline-flex", alignItems: "center", gap: 8,
+                    background: "#fff", borderRadius: 14, padding: "11px 22px",
+                    fontSize: 13, fontWeight: 700, color: C.navy, border: "none",
+                    cursor: "pointer", boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
+                    transition: "transform 0.15s",
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
+                  onMouseLeave={e => (e.currentTarget.style.transform = "none")}
+                >
+                  <Send size={14} /> Report an Issue
+                </button>
               </div>
-              <h1 style={{ fontSize: 56, fontWeight: 800, color: "#fff", margin: 0, lineHeight: 1.05, letterSpacing: "-0.02em" }}>Safety<br/>Dashboard</h1>
-              <p style={{ marginTop: 16, fontSize: 16, color: "#bfdbfe", lineHeight: 1.7, maxWidth: 420 }}>
-                Real accident data from Magdeburg&#39;s Unfallatlas — 2017 to 2024 — analysed across time, location and severity.
-              </p>
-              <button onClick={() => setModalOpen(true)} style={{
-                marginTop: 28, display: "inline-flex", alignItems: "center", gap: 8,
-                background: "#fff", borderRadius: 14, padding: "12px 24px",
-                fontSize: 14, fontWeight: 700, color: C.navy, border: "none",
-                cursor: "pointer", boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-                transition: "transform 0.15s",
-              }}
-                onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-                onMouseLeave={e => (e.currentTarget.style.transform = "none")}
-              >
-                <Send size={15} /> Report an Issue
-              </button>
-            </div>
-          </Container>
+            </Container>
+          </div>
+
+          {/* bottom: stat cards pinned to hero floor */}
+          <div style={{ background: "rgba(6,27,70,0.55)", backdropFilter: "blur(16px)", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+            <Container>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)" }}>
+                {heroStats.map((s, i) => (
+                  <div
+                    key={s.label}
+                    style={{
+                      padding: "20px 16px",
+                      textAlign: "center",
+                      borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.08)" : "none",
+                      animation: `fadeUp 0.5s ${i * 0.08}s ease both`,
+                    }}
+                  >
+                    {/* coloured icon circle */}
+                    <div style={{
+                      width: 40, height: 40, borderRadius: "50%",
+                      background: `${s.color}22`,
+                      border: `1.5px solid ${s.color}55`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      margin: "0 auto 10px",
+                    }}>
+                      <s.icon size={18} color={s.color} />
+                    </div>
+                    {/* big number */}
+                    <div style={{
+                      fontSize: 38, fontWeight: 900, color: s.color,
+                      fontVariantNumeric: "tabular-nums", lineHeight: 1,
+                      textShadow: `0 0 24px ${s.color}66`,
+                    }}>
+                      {loading ? (
+                        <div style={{ height: 38, width: 80, background: "rgba(255,255,255,0.1)", borderRadius: 8, margin: "0 auto", animation: "pulse 1.5s infinite" }} />
+                      ) : (
+                        <AnimCounter target={s.value} />
+                      )}
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0", marginTop: 6 }}>{s.label}</div>
+                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.38)", marginTop: 2 }}>{s.sub}</div>
+                  </div>
+                ))}
+              </div>
+            </Container>
+          </div>
         </div>
       </section>
 
-      {/* KPI strip */}
-      <div style={{ background: C.navy }}>
-        <Container>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)" }}>
-            {loading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} style={{ padding: "28px 20px", textAlign: "center" }}>
-                  <div style={{ height: 36, width: 80, background: "rgba(255,255,255,0.08)", borderRadius: 8, margin: "0 auto 8px", animation: "pulse 1.5s infinite" }} />
-                  <div style={{ height: 12, width: 100, background: "rgba(255,255,255,0.05)", borderRadius: 6, margin: "0 auto", animation: "pulse 1.5s infinite" }} />
-                </div>
-              ))
-              : ([
-                { icon: AlertTriangle, value: totalAccidents,     label: "Accidents (2017\u201324)", sub: "Unfallatlas",     color: "#60a5fa" },
-                { icon: TrendingDown,  value: fatalities,          label: "Fatalities",          sub: "UKATEGORIE = 1", color: "#f87171" },
-                { icon: Users,         value: cyclistInvolved,    label: "Cyclist Involved",    sub: "IstRad = 1",     color: "#34d399" },
-                { icon: MapPin,        value: pedestrianInvolved, label: "Pedestrians",         sub: "IstFuss = 1",    color: "#fbbf24" },
-              ] as { icon: React.ElementType; value: number; label: string; sub: string; color: string }[]).map((s, i) => (
-                <div key={s.label} style={{ padding: "28px 20px", textAlign: "center", borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.08)" : "none", animation: `fadeUp 0.5s ${i * 0.1}s ease both` }}>
-                  <s.icon size={18} color={s.color} style={{ marginBottom: 6 }} />
-                  <div style={{ fontSize: 34, fontWeight: 800, color: "#fff", fontVariantNumeric: "tabular-nums" }}>{s.value.toLocaleString()}</div>
-                  <div style={{ fontSize: 13, color: "#93c5fd", marginTop: 2 }}>{s.label}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>{s.sub}</div>
-                </div>
-              ))
-            }
-          </div>
-        </Container>
-      </div>
-
-      {/* Analytics Grid */}
+      {/* ── Analytics Grid ── */}
       <section style={{ padding: "48px 0" }}>
         <Container>
           <div style={{ marginBottom: 32 }}>
@@ -477,7 +515,7 @@ export default function Safety() {
         </Container>
       </section>
 
-      {/* KPI Cards */}
+      {/* ── KPI Cards ── */}
       <section style={{ padding: "0 0 48px" }}>
         <Container>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: C.navy, marginBottom: 20 }}>Key Figures</h2>
@@ -494,7 +532,7 @@ export default function Safety() {
         </Container>
       </section>
 
-      {/* Initiatives */}
+      {/* ── Initiatives ── */}
       <section style={{ paddingBottom: 80 }}>
         <Container>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: C.navy, marginBottom: 8 }}>Safety Initiatives</h2>
@@ -540,7 +578,7 @@ export default function Safety() {
         </Container>
       </section>
 
-      {/* FAB */}
+      {/* ── FAB ── */}
       <button onClick={() => setModalOpen(true)} style={{
         position: "fixed", bottom: 32, right: 32, zIndex: 40,
         display: "flex", alignItems: "center", gap: 8,
@@ -554,7 +592,7 @@ export default function Safety() {
         <Send size={15} /> Report Issue
       </button>
 
-      {/* Modal */}
+      {/* ── Modal ── */}
       {modalOpen && (
         <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)", animation: "fadeIn 0.2s ease" }}>
           <div style={{ width: "100%", maxWidth: 440, background: "#fff", borderRadius: 28, boxShadow: "0 24px 64px rgba(0,0,0,0.25)", animation: "scaleIn 0.25s ease" }}>
