@@ -533,7 +533,7 @@ export default function Transportation() {
         </Container>
       </div>
 
-      {/* ── LIVE MAP TAB — 40% map left | 60% stats right, both full viewport height */}
+      {/* ── LIVE MAP TAB */}
       {activeTab==="live" && (
         <div style={{display:"flex",height:"calc(100vh - 148px)",minHeight:520,background:"#f8fafc"}}>
 
@@ -761,15 +761,16 @@ export default function Transportation() {
         <div style={FADE_IN}>
           <Container className="py-8">
             <SectionTitle icon={Car} title="Vehicle Fleet — Magdeburg 2011–2025" subtitle="Source: Kraftfahrzeugbestand | Steady growth to 144,339 registered vehicles" color={C.blue}/>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-              <StatCard icon={Car}        value={latest.total.toLocaleString()} label="Total Vehicles" sub="2025" color={C.blue} animate/>
-              <StatCard icon={Car}        value={latest.cars.toLocaleString()}  label="Passenger Cars" sub="2025" color={C.green} animate/>
-              <StatCard icon={TrendingUp} value={latest.motorcycles.toLocaleString()} label="Motorcycles" sub="2025" color={C.orange} animate/>
-              <StatCard icon={Activity}   value={latest.trucks.toLocaleString()} label="Trucks/LGV" sub="2025" color={C.purple} animate/>
-              <StatCard icon={Navigation} value="587" label="Per 1,000 Residents" sub="motorisation rate 2025" color={C.yellow} animate/>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+              <StatCard icon={Car}        value={latest.total.toLocaleString()}        label="Total Vehicles"       sub="2025"                    color={C.blue}   animate/>
+              <StatCard icon={Car}        value={latest.cars.toLocaleString()}         label="Passenger Cars"       sub="2025"                    color={C.green}  animate/>
+              <StatCard icon={TrendingUp} value={latest.motorcycles.toLocaleString()}  label="Motorcycles"          sub="2025"                    color={C.orange} animate/>
+              <StatCard icon={Activity}   value={latest.trucks.toLocaleString()}        label="Trucks / LGV"         sub="2025"                    color={C.purple} animate/>
+              <StatCard icon={Navigation} value={latest.bicycles.toLocaleString()}      label="Bicycles"             sub="2025"                    color={C.teal}   animate/>
+              <StatCard icon={Navigation} value="587"                                   label="Per 1,000 Residents"  sub="motorisation rate 2025"  color={C.yellow} animate/>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-              <ChartCard title="🚗 Total Vehicle Fleet Growth" height={260}>
+              <ChartCard title="Total Vehicle Fleet Growth" height={260}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={FLEET_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                     <defs><linearGradient id="gTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.blue} stopOpacity={0.15}/><stop offset="95%" stopColor={C.blue} stopOpacity={0}/></linearGradient></defs>
@@ -781,7 +782,7 @@ export default function Transportation() {
                   </AreaChart>
                 </ResponsiveContainer>
               </ChartCard>
-              <ChartCard title="🔢 Fleet by Type" height={260}>
+              <ChartCard title="Fleet by Type" height={260}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={FLEET_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                     <defs>
@@ -801,7 +802,7 @@ export default function Transportation() {
                 </ResponsiveContainer>
               </ChartCard>
             </div>
-            <ChartCard title="🏙️ Motorisation Rate — Vehicles per 1,000 Residents" height={220}>
+            <ChartCard title="Motorisation Rate — Vehicles per 1,000 Residents" height={220}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={MOTORISATION_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
@@ -823,14 +824,16 @@ export default function Transportation() {
         <div style={FADE_IN}>
           <Container className="py-8">
             <SectionTitle icon={Leaf} title="Green & Alternative Fuel Vehicles" subtitle="Source: Fahrzeugbestand Kraftstoff | EV and hybrid registrations surging since 2023" color={C.green}/>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-              <StatCard icon={Zap}    value="2,679" label="Pure Electric" sub="2024 city total" color={C.yellow} animate/>
-              <StatCard icon={Leaf}   value="8,001" label="Full Hybrid" sub="2024 city total" color={C.green} animate/>
-              <StatCard icon={Leaf}   value="2,425" label="Mild Hybrid" sub="2024 city total" color={C.teal} animate/>
-              <StatCard icon={TrendingUp} value="63.0%" label="Gasoline share" sub="118k total 2024" color={C.blue} animate/>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+              <StatCard icon={Zap}        value="2,679"  label="Pure Electric"   sub="2024 city total"  color={C.yellow} animate/>
+              <StatCard icon={Leaf}       value="8,001"  label="Full Hybrid"     sub="2024 city total"  color={C.green}  animate/>
+              <StatCard icon={Leaf}       value="2,425"  label="Mild Hybrid"     sub="2024 city total"  color={C.teal}   animate/>
+              <StatCard icon={TrendingUp} value="74,446" label="Gasoline"        sub="2024 city total"  color={C.blue}   animate/>
+              <StatCard icon={TrendingUp} value="26,837" label="Diesel"          sub="2024 city total"  color={C.orange} animate/>
+              <StatCard icon={Activity}   value="633"    label="Gas / LPG"       sub="2024 city total"  color={C.purple} animate/>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <ChartCard title="⛽ Fuel Mix — Magdeburg 2024" height={300}>
+              <ChartCard title="Fuel Mix — Magdeburg 2024" height={300}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie data={FUEL_DATA} cx="50%" cy="50%" innerRadius="52%" outerRadius="75%" paddingAngle={3} dataKey="value" nameKey="name" isAnimationActive animationDuration={1000} animationBegin={200}>
@@ -841,7 +844,7 @@ export default function Transportation() {
                   </PieChart>
                 </ResponsiveContainer>
               </ChartCard>
-              <ChartCard title="🔋 Green Vehicle Registrations 2023–2025" height={300}>
+              <ChartCard title="Green Vehicle Registrations 2023–2025" height={300}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={GREEN_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
@@ -871,7 +874,7 @@ export default function Transportation() {
               <StatCard icon={Activity}  value="1,163"  label="Motorcycles" sub="2025" color={C.orange} animate/>
               <StatCard icon={TrendingUp} value="+119%" label="Growth 2020→2022" sub="COVID rebound" color={C.green} animate/>
             </div>
-            <ChartCard title="🪪 Licences Issued per Year — by Category" height={320}>
+            <ChartCard title="Licences Issued per Year — by Category" height={320}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={LICENCE_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
@@ -902,7 +905,7 @@ export default function Transportation() {
               <StatCard icon={TrendingUp} value="809"    label="Service Events" sub="2024 (gastronomy)" color={C.yellow} animate/>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <ChartCard title="⛵ Passengers & Route-km by Year" height={280}>
+              <ChartCard title="Passengers & Route-km by Year" height={280}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={BOAT_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
@@ -916,7 +919,7 @@ export default function Transportation() {
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>
-              <ChartCard title="⛵ Line Service vs Total Routes (km)" height={280}>
+              <ChartCard title="Line Service vs Total Routes (km)" height={280}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={BOAT_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                     <defs>
@@ -949,7 +952,7 @@ export default function Transportation() {
               <StatCard icon={Activity}   value="165k"    label="Local/Regional" sub="2019 vs 977k in 1998" color={C.red} animate/>
               <StatCard icon={TrendingUp} value="+1,474%" label="ICE growth" sub="1998 → 2012" color={C.green} animate/>
             </div>
-            <ChartCard title="🚆 Ticket Sales — Local vs Long-Distance (thousands)" height={320}>
+            <ChartCard title="Ticket Sales — Local vs Long-Distance (thousands)" height={320}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={HBF_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                   <defs>
@@ -964,7 +967,7 @@ export default function Transportation() {
                   <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
                   <Area type="monotone" dataKey="total"    name="Total"          stroke={C.purple} strokeWidth={2}   fill="url(#gHbfTotal)" isAnimationActive animationDuration={800}/>
                   <Area type="monotone" dataKey="longDist" name="Long-Distance"  stroke={C.blue}   strokeWidth={2.5} fill="url(#gHbfLong)"  isAnimationActive animationDuration={1000}/>
-                  <Area type="monotone" dataKey="local"    name="Local/Regional" stroke={C.orange} strokeWidth={2}   fill="url(#gHbfLocal)" isAnimationActive animationDuration={1100}/>
+                  <Area type="monotone" dataKey="local"    name="Local/Regional" stroke={C.orange} strokeWidth={2}   fill="url(#gHbfLocal}" isAnimationActive animationDuration={1100}/>
                 </AreaChart>
               </ResponsiveContainer>
             </ChartCard>
