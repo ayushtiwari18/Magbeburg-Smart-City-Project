@@ -19,7 +19,6 @@ const navItems = [
   { de: "Projekte",          en: "Projects",         href: "/projects" },
   { de: "Einblicke",         en: "Insights",         href: "/insights" },
   { de: "Veranstaltungen",   en: "Events",           href: "/events" },
-  { de: "Karte",             en: "Map",              href: "/map" },
 ];
 
 export default function Navbar() {
