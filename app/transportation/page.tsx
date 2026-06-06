@@ -236,7 +236,7 @@ function ChartCard({title,children,height=280}:{title:string;children:React.Reac
   );
 }
 
-function DonutChart({segments,size=72}:{segments:{label:string;value:number;color:string}[];size?:number}) {
+function DonutChart({segments,size=88}:{segments:{label:string;value:number;color:string}[];size?:number}) {
   const total=segments.reduce((s,d)=>s+d.value,0);
   if(total===0) return <div style={{height:size,display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{width:20,height:20,borderRadius:"50%",border:"3px solid #e2e8f0",borderTopColor:"#2563eb",animation:"spin 0.8s linear infinite"}}/></div>;
   let angle=-Math.PI/2;
@@ -249,15 +249,21 @@ function DonutChart({segments,size=72}:{segments:{label:string;value:number;colo
     return{...s,d:`M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${sweep>Math.PI?1:0} 1 ${x2},${y2} Z`};
   });
   return(
-    <div style={{display:"flex",alignItems:"center",gap:10}}>
+    <div style={{display:"flex",alignItems:"center",gap:14}}>
       <svg viewBox={`0 0 ${size} ${size}`} style={{width:size,height:size,flexShrink:0}}>
         {slices.map(s=><path key={s.label} d={s.d} fill={s.color} stroke="#f8fafc" strokeWidth="1"/>)}
         <circle cx={cx} cy={cy} r={R*0.52} fill="white"/>
-        <text x={cx} y={cy-3} textAnchor="middle" fill="#061B46" fontSize={size*0.11} fontWeight="700">{total}</text>
-        <text x={cx} y={cy+9} textAnchor="middle" fill="#94a3b8" fontSize={size*0.09}>routes</text>
+        <text x={cx} y={cy-4} textAnchor="middle" fill="#061B46" fontSize={size*0.13} fontWeight="700">{total}</text>
+        <text x={cx} y={cy+10} textAnchor="middle" fill="#94a3b8" fontSize={size*0.10}>routes</text>
       </svg>
-      <div style={{display:"flex",flexDirection:"column",gap:3}}>
-        {segments.map(s=>(<div key={s.label} style={{display:"flex",alignItems:"center",gap:5}}><span style={{width:7,height:7,borderRadius:"50%",background:s.color,flexShrink:0}}/><span style={{fontSize:10,color:"#64748b"}}>{s.label}</span><span style={{fontSize:10,color:"#2563eb",marginLeft:"auto",fontVariantNumeric:"tabular-nums"}}>{s.value}</span></div>))}
+      <div style={{display:"flex",flexDirection:"column",gap:5,flex:1}}>
+        {segments.map(s=>(
+          <div key={s.label} style={{display:"flex",alignItems:"center",gap:6}}>
+            <span style={{width:9,height:9,borderRadius:"50%",background:s.color,flexShrink:0}}/>
+            <span style={{fontSize:12,color:"#475569",flex:1}}>{s.label}</span>
+            <span style={{fontSize:13,fontWeight:700,color:s.color,fontVariantNumeric:"tabular-nums"}}>{s.value}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -266,13 +272,17 @@ function DonutChart({segments,size=72}:{segments:{label:string;value:number;colo
 function PeakChart({visible}:{visible:Set<string>}) {
   const combined=Array.from({length:24},(_,h)=>OPERATORS.filter(op=>visible.has(op.key)).reduce((s,op)=>s+(op.peakHours[h]??0),0));
   const max=Math.max(...combined,1);const peakH=combined.indexOf(Math.max(...combined));
-  const W=254;const H=56;const pad=14;const bw=(W-pad*2)/24-1;
+  const W=320;const H=80;const pad=16;const bw=(W-pad*2)/24-1.5;
   return(
-    <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:56}}>
+    <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:80}}>
       <defs><linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#3b82f6"/><stop offset="100%" stopColor="#6366f1"/></linearGradient></defs>
       {Array.from({length:24},(_,h)=>{
-        const x=pad+h*((W-pad*2)/24);const bH=(combined[h]/max)*(H-pad);const y=H-bH-4;const isPeak=h===peakH;
-        return(<g key={h}><rect x={x} y={y} width={Math.max(bw,2)} height={bH} fill={isPeak?"#f59e0b":"url(#bg2)"} rx="1" opacity={isPeak?1:0.7}/>{h%6===0&&<text x={x+bw/2} y={H} textAnchor="middle" fill="#94a3b8" fontSize="7">{String(h).padStart(2,"0")}</text>}{isPeak&&<text x={x+bw/2} y={y-2} textAnchor="middle" fill="#f59e0b" fontSize="7" fontWeight="700">▲</text>}</g>);
+        const x=pad+h*((W-pad*2)/24);const bH=(combined[h]/max)*(H-pad-6);const y=H-bH-8;const isPeak=h===peakH;
+        return(<g key={h}>
+          <rect x={x} y={y} width={Math.max(bw,2)} height={bH} fill={isPeak?"#f59e0b":"url(#bg2)"} rx="2" opacity={isPeak?1:0.7}/>
+          {h%6===0&&<text x={x+bw/2} y={H-1} textAnchor="middle" fill="#94a3b8" fontSize="8">{String(h).padStart(2,"0")}</text>}
+          {isPeak&&<text x={x+bw/2} y={y-3} textAnchor="middle" fill="#f59e0b" fontSize="9" fontWeight="700">▲</text>}
+        </g>);
       })}
     </svg>
   );
@@ -289,7 +299,6 @@ const TABS = [
 
 const FADE_IN: React.CSSProperties = { animation: "fadeIn 0.35s ease" };
 
-// ── Mini sparkline for glance bar
 function MiniSparkline({data,color}:{data:{passengers:number}[];color:string}) {
   if (data.length < 2) return null;
   const vals = data.map(d => d.passengers);
@@ -322,13 +331,11 @@ export default function Transportation() {
   const [opLoading, setOpLoading] = useState<Record<string,boolean>>(Object.fromEntries(OPERATORS.map(o=>[o.key,true])));
   const [ridershipData, setRidershipData] = useState<{year:number;passengers:number}[]>([]);
   const [kissLoading, setKissLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [liveTime, setLiveTime] = useState("");
 
   useEffect(()=>{ setMounted(true); },[]);
 
-  // Live clock
   useEffect(()=>{
     const tick = () => setLiveTime(new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit",second:"2-digit"}));
     tick();
@@ -443,7 +450,6 @@ export default function Transportation() {
   const donutData=OPERATORS.map(op=>({label:op.label,value:opRoutes[op.key]?.length??0,color:op.color})).filter(d=>d.value>0);
   const latest = FLEET_DATA.at(-1)!;
 
-  // KPI tiles for glance bar
   const kpiTiles = [
     { Icon:MapPin,    val:totalStops>0?totalStops.toLocaleString():"—",                        label:"Stops",          sub:"GTFS live",        color:"#60a5fa" },
     { Icon:TrendingUp,val:totalRoutes>0?String(totalRoutes):"—",                               label:"Routes",         sub:"all operators",    color:"#34d399" },
@@ -456,10 +462,9 @@ export default function Transportation() {
   return (
     <div className="bg-[#f8fafc] min-h-screen">
 
-      {/* ── GLANCE BAR — Power BI style sticky header */}
+      {/* ── GLANCE BAR */}
       <div className="sticky top-0 z-40 bg-[#061B46] border-b border-white/10 shadow-xl">
         <div className="px-4 lg:px-8">
-          {/* Top row: title + clock + operator toggles */}
           <div className="flex items-center gap-4 py-2.5 border-b border-white/10">
             <div className="flex items-center gap-2.5 flex-shrink-0">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/20">
@@ -471,21 +476,18 @@ export default function Transportation() {
               </div>
             </div>
             <div className="h-6 w-px bg-white/10 flex-shrink-0"/>
-            {/* Live clock */}
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" style={{animation:"ping 1.5s ease-in-out infinite"}}/>
               <span className="text-xs font-mono font-bold text-green-300">{liveTime || "—"}</span>
               <span className="text-[10px] text-white/30 ml-1">{allLoaded ? "● Live" : "● Loading…"}</span>
             </div>
             <div className="h-6 w-px bg-white/10 flex-shrink-0"/>
-            {/* Ridership sparkline */}
             {!kissLoading && ridershipData.length > 1 && (
               <div className="flex items-center gap-2 flex-shrink-0">
                 <span className="text-[10px] text-white/40 uppercase tracking-widest">MVB trend</span>
                 <MiniSparkline data={ridershipData} color="#60a5fa"/>
               </div>
             )}
-            {/* Operator toggles — pushed right */}
             <div className="flex gap-1.5 flex-wrap ml-auto">
               {OPERATORS.map(op=>{
                 const on=visible.has(op.key); const Icon=op.Icon;
@@ -500,13 +502,11 @@ export default function Transportation() {
               })}
             </div>
           </div>
-
-          {/* KPI strip */}
-          <div className="grid grid-cols-3 sm:grid-cols-6 divide-x divide-white/10 py-0">
+          <div className="grid grid-cols-3 sm:grid-cols-6 divide-x divide-white/10">
             {kpiTiles.map(k=>(
-              <div key={k.label} className="flex flex-col items-center justify-center py-3 px-2 text-center group cursor-default hover:bg-white/5 transition-colors">
-                <k.Icon size={12} color={k.color} className="mb-1 opacity-80"/>
-                <div className="text-xl font-bold tabular-nums text-white leading-tight">{k.val}</div>
+              <div key={k.label} className="flex flex-col items-center justify-center py-3 px-2 text-center hover:bg-white/5 transition-colors cursor-default">
+                <k.Icon size={12} color={k.color}/>
+                <div className="text-xl font-bold tabular-nums text-white leading-tight mt-1">{k.val}</div>
                 <div className="text-[10px] font-semibold text-white/60 mt-0.5">{k.label}</div>
                 <div className="text-[9px] text-white/30">{k.sub}</div>
               </div>
@@ -515,7 +515,7 @@ export default function Transportation() {
         </div>
       </div>
 
-      {/* ── Tab Bar — flush below glance bar */}
+      {/* ── Tab Bar */}
       <div className="bg-white border-b border-slate-200 sticky top-[108px] z-30">
         <Container>
           <div className="flex gap-1 overflow-x-auto">
@@ -533,81 +533,219 @@ export default function Transportation() {
         </Container>
       </div>
 
-      {/* ── LIVE MAP TAB */}
+      {/* ── LIVE MAP TAB — map small on top, charts large below */}
       {activeTab==="live" && (
-        <div style={{display:"flex",height:"calc(100vh - 148px)",minHeight:500}}>
-          {/* sidebar */}
-          <div style={{width:sidebarOpen?240:0,minWidth:sidebarOpen?240:0,overflow:"hidden",transition:"width 0.25s,min-width 0.25s",background:"white",borderRight:"1px solid #e2e8f0",display:"flex",flexDirection:"column"}}>
-            <div style={{flex:1,overflowY:"auto",padding:"12px",scrollbarWidth:"none"}}>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 mb-3">
-                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-1"><Users size={9}/>MVB Ridership</div>
-                {kissLoading?Array.from({length:5}).map((_,i)=>(<div key={i} className="flex items-center gap-2 mb-2"><div className="w-6 h-2 rounded bg-slate-200"/><div className="flex-1 h-1.5 rounded bg-slate-200"/><div className="w-7 h-2 rounded bg-slate-200"/></div>)):ridershipData.length===0?(<p className="text-xs text-slate-400 text-center">No data</p>):(
-                  ridershipData.slice(-8).map(d=>(
-                    <div key={d.year} className="flex items-center gap-2 mb-1.5">
-                      <span className="text-xs text-blue-600 w-8 tabular-nums">{d.year}</span>
-                      <div className="flex-1 h-1.5 bg-slate-200 rounded overflow-hidden">
-                        <div style={{height:"100%",width:`${Math.round((d.passengers/maxPass)*100)}%`,background:"linear-gradient(90deg,#3b82f6,#06b6d4)",borderRadius:3,transition:"width 0.8s"}}/>
-                      </div>
-                      <span className="text-xs text-slate-500 w-8 text-right tabular-nums">{(d.passengers/1e6).toFixed(1)}M</span>
-                    </div>
-                  ))
-                )}
-              </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 mb-3">
-                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-1"><Zap size={9}/>Routes by Operator</div>
-                <DonutChart segments={donutData} size={72}/>
-              </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 mb-3">
-                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1"><Clock size={9}/>Departures by Hour</div>
-                <div className="text-xs text-slate-400 mb-1">▲ amber = network peak</div>
-                <PeakChart visible={visible}/>
-              </div>
-              <div>
-                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-1"><TrendingUp size={9}/>Operator Breakdown</div>
-                <div className="grid grid-cols-2 gap-2">
-                  {OPERATORS.map(op=>{
-                    const peakH=op.peakHours.indexOf(Math.max(...op.peakHours));
-                    const avgTrips=Math.round(op.peakHours.reduce((a,b)=>a+b,0)/Math.max(op.peakHours.filter(Boolean).length,1));
-                    const Icon=op.Icon;const mx=Math.max(...op.peakHours,1);
-                    const pts=op.peakHours.map((v,h)=>`${(h/23)*90+5},${22-(v/mx)*16}`);
-                    return(
-                      <div key={op.key} className="rounded-lg border bg-white p-2" style={{borderColor:visible.has(op.key)?op.color+"44":"#e2e8f0",opacity:visible.has(op.key)?1:0.4,transition:"opacity 0.2s"}}>
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <div className="w-5 h-5 rounded flex items-center justify-center" style={{background:op.color}}><Icon size={10} color="white"/></div>
-                          <div><div className="text-xs font-bold" style={{color:"#061B46"}}>{op.vehicleEmoji} {op.label}</div><div className="text-[9px] text-slate-400">{op.type}</div></div>
-                        </div>
-                        <div className="flex justify-between mb-1">
-                          <div className="text-center"><div className="text-xs font-bold tabular-nums" style={{color:op.color}}>{opLoading[op.key]?"…":(opStops[op.key]?.length??0).toLocaleString()}</div><div className="text-[8px] text-slate-400">stops</div></div>
-                          <div className="text-center"><div className="text-xs font-bold" style={{color:op.color}}>{String(peakH).padStart(2,"0")}h</div><div className="text-[8px] text-slate-400">peak</div></div>
-                          <div className="text-center"><div className="text-xs font-bold" style={{color:op.color}}>{avgTrips}</div><div className="text-[8px] text-slate-400">avg/h</div></div>
-                        </div>
-                        <svg viewBox="0 0 100 24" style={{width:"100%",height:18}}><defs><linearGradient id={`sp-${op.key}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={op.color} stopOpacity="0.2"/><stop offset="100%" stopColor={op.color} stopOpacity="0"/></linearGradient></defs><path d={`M${pts[0]} ${pts.slice(1).map(p=>`L${p}`).join(" ")} L95,22 L5,22 Z`} fill={`url(#sp-${op.key})`}/><polyline points={pts.join(" ")} fill="none" stroke={op.color} strokeWidth="1.2" strokeLinejoin="round"/></svg>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="text-[9px] text-slate-300 mt-3">GTFS: NASA GmbH · Ridership: KISS-MD · Datenlizenz Deutschland – v2.0</div>
-            </div>
-          </div>
-          <button onClick={()=>setSidebarOpen(v=>!v)} className="w-5 bg-slate-50 border-r border-slate-200 flex items-center justify-center text-slate-400 flex-shrink-0 z-10 hover:bg-slate-100 transition-colors">
-            {sidebarOpen?<ChevronLeft size={12}/>:<ChevronRight size={12}/>}
-          </button>
-          <div style={{position:"relative",flex:1,minWidth:0}}>
+        <div style={{background:"#f8fafc"}}>
+
+          {/* MAP — compact fixed height */}
+          <div style={{position:"relative",height:320,background:"#e8edf2"}}>
             <div ref={mapRef} style={{width:"100%",height:"100%"}}/>
+            {/* LIVE badge */}
             <div className="absolute top-3 left-3 z-[999] bg-white/90 backdrop-blur rounded-lg px-3 py-1.5 border border-slate-200 shadow-sm flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500 inline-block" style={{animation:"ping 1.5s ease-in-out infinite"}}/>
               <span className="text-xs font-bold text-slate-700">LIVE</span>
               <span className="text-xs text-slate-400">vehicles · stops</span>
             </div>
-            <div className="absolute bottom-5 left-3 z-[999] bg-white/95 backdrop-blur rounded-xl p-3 border border-slate-200 shadow-sm min-w-[160px]">
-              <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-2">Legend</div>
-              {OPERATORS.map(op=>{
-                const Icon=op.Icon;
-                return(<div key={op.key} className="flex items-center gap-2 mb-1.5" style={{opacity:visible.has(op.key)?1:0.25}}><div className="w-4 h-4 rounded flex items-center justify-center" style={{background:op.color}}><Icon size={8} color="white"/></div><span className="text-[9px] text-slate-600 font-semibold">{op.vehicleEmoji} {op.label}</span><span className="text-[8px] text-slate-400 ml-auto">{op.type}</span></div>);
-              })}
-            </div>
+            {/* Loading spinner */}
             {!allLoaded&&(<div className="absolute top-3 right-3 z-[999] bg-white/90 backdrop-blur rounded-full px-3 py-1 border border-slate-200 shadow-sm flex items-center gap-2 text-xs text-slate-500"><span style={{width:7,height:7,borderRadius:"50%",border:"1.5px solid #cbd5e1",borderTopColor:"#3b82f6",display:"inline-block",animation:"spin 0.8s linear infinite"}}/>Loading GTFS…</div>)}
+            {/* Legend overlay */}
+            <div className="absolute bottom-3 left-3 z-[999] bg-white/95 backdrop-blur rounded-xl p-2.5 border border-slate-200 shadow-sm">
+              <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Legend</div>
+              <div className="flex gap-3 flex-wrap">
+                {OPERATORS.map(op=>{
+                  const Icon=op.Icon;
+                  return(<div key={op.key} className="flex items-center gap-1.5" style={{opacity:visible.has(op.key)?1:0.25}}><div className="w-4 h-4 rounded flex items-center justify-center" style={{background:op.color}}><Icon size={8} color="white"/></div><span className="text-[9px] text-slate-600 font-semibold">{op.vehicleEmoji} {op.label}</span></div>);
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* DATA PANELS — full width below map */}
+          <div style={{padding:"20px 24px 32px",maxWidth:1400,margin:"0 auto"}}>
+
+            {/* Row 1: MVB Ridership (area chart) + Routes donut */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
+
+              {/* MVB Ridership chart */}
+              <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{background:"#2563eb18"}}>
+                    <Users size={13} color={C.blue}/>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-700 m-0">MVB Ridership</p>
+                    <p className="text-[10px] text-slate-400 m-0">Beförderungsfälle · KISS-MD</p>
+                  </div>
+                  {latestRidership && (
+                    <div className="ml-auto text-right">
+                      <div className="text-xl font-bold tabular-nums text-[#061B46]">{(latestRidership.passengers/1e6).toFixed(1)}M</div>
+                      <div className="text-[10px] text-slate-400">{latestRidership.year}</div>
+                    </div>
+                  )}
+                </div>
+                {kissLoading ? (
+                  <div style={{height:200,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <div style={{width:24,height:24,borderRadius:"50%",border:"3px solid #e2e8f0",borderTopColor:"#2563eb",animation:"spin 0.8s linear infinite"}}/>
+                  </div>
+                ) : ridershipData.length === 0 ? (
+                  <div style={{height:200,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <p className="text-slate-400 text-sm">No data available</p>
+                  </div>
+                ) : (
+                  <div style={{height:200}}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={ridershipData} margin={{top:5,right:10,left:0,bottom:5}}>
+                        <defs>
+                          <linearGradient id="gRidership" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={C.blue} stopOpacity={0.2}/>
+                            <stop offset="95%" stopColor={C.blue} stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
+                        <YAxis tickFormatter={v=>Math.round(v/1e6)+"M"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
+                        <Tooltip content={<LightTooltip/>}
+                          formatter={(v:number)=>[(v/1e6).toFixed(2)+"M","Passengers"]}/>
+                        <Area type="monotone" dataKey="passengers" name="Passengers" stroke={C.blue} strokeWidth={2.5} fill="url(#gRidership)" isAnimationActive animationDuration={1200}/>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+                {/* mini bar rows repeated below the chart */}
+                {!kissLoading && ridershipData.length > 0 && (
+                  <div style={{marginTop:12,borderTop:"1px solid #f1f5f9",paddingTop:10}}>
+                    {ridershipData.slice(-5).reverse().map(d=>(
+                      <div key={d.year} className="flex items-center gap-2 mb-1.5">
+                        <span className="text-xs font-semibold text-blue-600 w-8 tabular-nums">{d.year}</span>
+                        <div className="flex-1 h-1.5 bg-slate-100 rounded overflow-hidden">
+                          <div style={{height:"100%",width:`${Math.round((d.passengers/maxPass)*100)}%`,background:"linear-gradient(90deg,#3b82f6,#06b6d4)",borderRadius:3,transition:"width 0.8s"}}/>
+                        </div>
+                        <span className="text-xs text-slate-500 w-10 text-right tabular-nums">{(d.passengers/1e6).toFixed(1)}M</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Routes by Operator */}
+              <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{background:"#16a34a18"}}>
+                    <Navigation size={13} color={C.green}/>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-700 m-0">Routes by Operator</p>
+                    <p className="text-[10px] text-slate-400 m-0">GTFS · NASA GmbH</p>
+                  </div>
+                  <div className="ml-auto text-xl font-bold tabular-nums text-[#061B46]">{totalRoutes>0?totalRoutes:"—"}<span className="text-xs font-normal text-slate-400 ml-1">routes</span></div>
+                </div>
+                <div style={{marginBottom:16}}>
+                  <DonutChart segments={donutData} size={100}/>
+                </div>
+                {/* Routes bar chart */}
+                <div style={{height:140}}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={donutData.length>0?donutData:[{label:"Loading",value:0,color:C.muted}]} margin={{top:4,right:8,left:0,bottom:4}} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false}/>
+                      <XAxis type="number" tick={{fill:C.muted,fontSize:10}} tickLine={false} axisLine={false}/>
+                      <YAxis type="category" dataKey="label" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} width={38}/>
+                      <Tooltip content={<LightTooltip/>}/>
+                      <Bar dataKey="value" name="Routes" radius={[0,4,4,0]} isAnimationActive animationDuration={900}>
+                        {donutData.map((d,i)=>(<Cell key={i} fill={d.color}/>))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2: Departures by Hour + Operator Breakdown */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
+
+              {/* Departures by Hour */}
+              <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{background:"#d9770618"}}>
+                    <Clock size={13} color={C.amber}/>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-700 m-0">Departures by Hour</p>
+                    <p className="text-[10px] text-slate-400 m-0">▲ amber = network peak · all visible operators</p>
+                  </div>
+                </div>
+                <PeakChart visible={visible}/>
+                {/* Hour labels clarification */}
+                <div className="flex justify-between mt-1">
+                  {["00","06","12","18"].map(h=>(<span key={h} className="text-[9px] text-slate-300">{h}h</span>))}
+                </div>
+                {/* Per-operator peak bar */}
+                <div style={{marginTop:14,display:"flex",flexDirection:"column",gap:6}}>
+                  {OPERATORS.filter(op=>visible.has(op.key)).map(op=>{
+                    const peakH=op.peakHours.indexOf(Math.max(...op.peakHours));
+                    const mx=Math.max(...op.peakHours,1);
+                    return(
+                      <div key={op.key} className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold w-10" style={{color:op.color}}>{op.vehicleEmoji} {op.label}</span>
+                        <div className="flex-1 h-2 bg-slate-100 rounded overflow-hidden">
+                          <div style={{height:"100%",width:`${Math.round((op.peakHours[peakH]/mx)*100)}%`,background:op.color,borderRadius:3}}/>
+                        </div>
+                        <span className="text-[10px] text-slate-400 w-6 text-right">{String(peakH).padStart(2,"0")}h</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Operator Breakdown */}
+              <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{background:"#7c3aed18"}}>
+                    <TrendingUp size={13} color={C.purple}/>
+                  </div>
+                  <p className="text-sm font-bold text-slate-700 m-0">Operator Breakdown</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {OPERATORS.map(op=>{
+                    const peakH=op.peakHours.indexOf(Math.max(...op.peakHours));
+                    const avgTrips=Math.round(op.peakHours.reduce((a,b)=>a+b,0)/Math.max(op.peakHours.filter(Boolean).length,1));
+                    const Icon=op.Icon;
+                    const mx=Math.max(...op.peakHours,1);
+                    const pts=op.peakHours.map((v,h)=>`${(h/23)*90+5},${36-(v/mx)*28}`);
+                    return(
+                      <div key={op.key} className="rounded-xl border p-3" style={{borderColor:visible.has(op.key)?op.color+"44":"#e2e8f0",opacity:visible.has(op.key)?1:0.4,transition:"opacity 0.2s"}}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{background:op.color}}><Icon size={11} color="white"/></div>
+                          <div>
+                            <div className="text-xs font-bold" style={{color:"#061B46"}}>{op.vehicleEmoji} {op.label}</div>
+                            <div className="text-[9px] text-slate-400">{op.type}</div>
+                          </div>
+                        </div>
+                        <div className="flex justify-between mb-2">
+                          <div className="text-center">
+                            <div className="text-sm font-bold tabular-nums" style={{color:op.color}}>{opLoading[op.key]?"…":(opStops[op.key]?.length??0).toLocaleString()}</div>
+                            <div className="text-[9px] text-slate-400">stops</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-sm font-bold" style={{color:op.color}}>{String(peakH).padStart(2,"0")}h</div>
+                            <div className="text-[9px] text-slate-400">peak</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-sm font-bold" style={{color:op.color}}>{avgTrips}</div>
+                            <div className="text-[9px] text-slate-400">avg/h</div>
+                          </div>
+                        </div>
+                        <svg viewBox="0 0 100 40" style={{width:"100%",height:28}}>
+                          <defs><linearGradient id={`sp-${op.key}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={op.color} stopOpacity="0.2"/><stop offset="100%" stopColor={op.color} stopOpacity="0"/></linearGradient></defs>
+                          <path d={`M${pts[0]} ${pts.slice(1).map(p=>`L${p}`).join(" ")} L95,40 L5,40 Z`} fill={`url(#sp-${op.key})`}/>
+                          <polyline points={pts.join(" ")} fill="none" stroke={op.color} strokeWidth="1.5" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-[9px] text-slate-300 mt-3">GTFS: NASA GmbH · Ridership: KISS-MD · Datenlizenz Deutschland – v2.0</p>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -641,7 +779,7 @@ export default function Transportation() {
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={FLEET_DATA} margin={{top:5,right:10,left:0,bottom:5}}>
                     <defs>
-                      {[["gCars",C.blue],["gTrucks",C.green],["gMoto",C.orange]].map(([id,c])=>(
+                      {([["gCars",C.blue],["gTrucks",C.green],["gMoto",C.orange]] as [string,string][]).map(([id,c])=>(
                         <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={c} stopOpacity={0.15}/><stop offset="95%" stopColor={c} stopOpacity={0}/></linearGradient>
                       ))}
                     </defs>
