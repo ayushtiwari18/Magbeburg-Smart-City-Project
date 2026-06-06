@@ -189,11 +189,11 @@ const LightTooltip = ({ active, payload, label }: {
   );
 };
 
-function StatCard({icon:Icon,value,label,sub,color=C.blue,delta,animate=false}:{
+// FIX: initialise display value directly from `value` prop so numbers
+// are visible immediately on first render without waiting for useEffect.
+function StatCard({icon:Icon,value,label,sub,color=C.blue,delta}:{
   icon:React.ElementType;value:string;label:string;sub?:string;color?:string;delta?:string;animate?:boolean;
 }) {
-  const [v,setV] = useState("—");
-  useEffect(()=>{ if (animate) { let i=0; const t=setInterval(()=>{ i+=0.05; setV(value); if(i>=1)clearInterval(t); },20); return ()=>clearInterval(t); } else setV(value); },[value,animate]);
   return (
     <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm relative overflow-hidden"
       style={{transition:"box-shadow 0.2s"}}
@@ -204,7 +204,7 @@ function StatCard({icon:Icon,value,label,sub,color=C.blue,delta,animate=false}:{
         <Icon size={14} color={color}/>
         <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">{label}</span>
       </div>
-      <div className="text-3xl font-bold tabular-nums" style={{color:"#061B46"}}>{v}</div>
+      <div className="text-3xl font-bold tabular-nums" style={{color:"#061B46"}}>{value}</div>
       {sub&&<div className="text-xs text-slate-400 mt-1">{sub}</div>}
       {delta&&<div className="text-xs font-semibold mt-1" style={{color:delta.startsWith("+")?C.green:C.red}}>{delta}</div>}
     </div>
@@ -762,12 +762,12 @@ export default function Transportation() {
           <Container className="py-8">
             <SectionTitle icon={Car} title="Vehicle Fleet — Magdeburg 2011–2025" subtitle="Source: Kraftfahrzeugbestand | Steady growth to 144,339 registered vehicles" color={C.blue}/>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-              <StatCard icon={Car}        value={latest.total.toLocaleString()}        label="Total Vehicles"       sub="2025"                    color={C.blue}   animate/>
-              <StatCard icon={Car}        value={latest.cars.toLocaleString()}         label="Passenger Cars"       sub="2025"                    color={C.green}  animate/>
-              <StatCard icon={TrendingUp} value={latest.motorcycles.toLocaleString()}  label="Motorcycles"          sub="2025"                    color={C.orange} animate/>
-              <StatCard icon={Activity}   value={latest.trucks.toLocaleString()}        label="Trucks / LGV"         sub="2025"                    color={C.purple} animate/>
-              <StatCard icon={Navigation} value={latest.bicycles.toLocaleString()}      label="Bicycles"             sub="2025"                    color={C.teal}   animate/>
-              <StatCard icon={Navigation} value="587"                                   label="Per 1,000 Residents"  sub="motorisation rate 2025"  color={C.yellow} animate/>
+              <StatCard icon={Car}        value={latest.total.toLocaleString()}        label="Total Vehicles"       sub="2025"                    color={C.blue}/>
+              <StatCard icon={Car}        value={latest.cars.toLocaleString()}         label="Passenger Cars"       sub="2025"                    color={C.green}/>
+              <StatCard icon={TrendingUp} value={latest.motorcycles.toLocaleString()}  label="Motorcycles"          sub="2025"                    color={C.orange}/>
+              <StatCard icon={Activity}   value={latest.trucks.toLocaleString()}        label="Trucks / LGV"         sub="2025"                    color={C.purple}/>
+              <StatCard icon={Navigation} value={latest.bicycles.toLocaleString()}      label="Bicycles"             sub="2025"                    color={C.teal}/>
+              <StatCard icon={Navigation} value="587"                                   label="Per 1,000 Residents"  sub="motorisation rate 2025"  color={C.yellow}/>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
               <ChartCard title="Total Vehicle Fleet Growth" height={260}>
@@ -825,12 +825,12 @@ export default function Transportation() {
           <Container className="py-8">
             <SectionTitle icon={Leaf} title="Green & Alternative Fuel Vehicles" subtitle="Source: Fahrzeugbestand Kraftstoff | EV and hybrid registrations surging since 2023" color={C.green}/>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-              <StatCard icon={Zap}        value="2,679"  label="Pure Electric"   sub="2024 city total"  color={C.yellow} animate/>
-              <StatCard icon={Leaf}       value="8,001"  label="Full Hybrid"     sub="2024 city total"  color={C.green}  animate/>
-              <StatCard icon={Leaf}       value="2,425"  label="Mild Hybrid"     sub="2024 city total"  color={C.teal}   animate/>
-              <StatCard icon={TrendingUp} value="74,446" label="Gasoline"        sub="2024 city total"  color={C.blue}   animate/>
-              <StatCard icon={TrendingUp} value="26,837" label="Diesel"          sub="2024 city total"  color={C.orange} animate/>
-              <StatCard icon={Activity}   value="633"    label="Gas / LPG"       sub="2024 city total"  color={C.purple} animate/>
+              <StatCard icon={Zap}        value="2,679"  label="Pure Electric"   sub="2024 city total"  color={C.yellow}/>
+              <StatCard icon={Leaf}       value="8,001"  label="Full Hybrid"     sub="2024 city total"  color={C.green}/>
+              <StatCard icon={Leaf}       value="2,425"  label="Mild Hybrid"     sub="2024 city total"  color={C.teal}/>
+              <StatCard icon={TrendingUp} value="74,446" label="Gasoline"        sub="2024 city total"  color={C.blue}/>
+              <StatCard icon={TrendingUp} value="26,837" label="Diesel"          sub="2024 city total"  color={C.orange}/>
+              <StatCard icon={Activity}   value="633"    label="Gas / LPG"       sub="2024 city total"  color={C.purple}/>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               <ChartCard title="Fuel Mix — Magdeburg 2024" height={300}>
@@ -869,10 +869,10 @@ export default function Transportation() {
           <Container className="py-8">
             <SectionTitle icon={BarChart2} title="Driver's Licences Issued — Magdeburg" subtitle="Source: Führerscheine | Post-COVID surge: 12,527 in 2022 vs 5,843 in 2020" color={C.purple}/>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-              <StatCard icon={BarChart2} value="12,770" label="Total Licences" sub="2025" color={C.purple} animate/>
-              <StatCard icon={Car}       value="2,820"  label="Car (Class B)" sub="2025" color={C.blue} animate/>
-              <StatCard icon={Activity}  value="1,163"  label="Motorcycles" sub="2025" color={C.orange} animate/>
-              <StatCard icon={TrendingUp} value="+119%" label="Growth 2020→2022" sub="COVID rebound" color={C.green} animate/>
+              <StatCard icon={BarChart2}  value="12,770" label="Total Licences"    sub="2025"              color={C.purple}/>
+              <StatCard icon={Car}        value="2,820"  label="Car (Class B)"     sub="2025"              color={C.blue}/>
+              <StatCard icon={Activity}   value="1,163"  label="Motorcycles"       sub="2025"              color={C.orange}/>
+              <StatCard icon={TrendingUp} value="+119%"  label="Growth 2020→2022"  sub="COVID rebound"     color={C.green}/>
             </div>
             <ChartCard title="Licences Issued per Year — by Category" height={320}>
               <ResponsiveContainer width="100%" height="100%">
@@ -899,10 +899,10 @@ export default function Transportation() {
           <Container className="py-8">
             <SectionTitle icon={Anchor} title="Weiße Flotte — River Transport 2017–2024" subtitle="Source: Weisse Flotte GmbH | Strong rebound to 41,525 passengers in 2024" color={C.teal}/>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-              <StatCard icon={Users}      value="41,525" label="Passengers 2024" sub="+24% vs 2023" color={C.teal} animate/>
-              <StatCard icon={Navigation} value="36,501" label="Total Routes (km)" sub="2024" color={C.blue} animate/>
-              <StatCard icon={Activity}   value="24,816" label="Line Service (km)" sub="2024" color={C.green} animate/>
-              <StatCard icon={TrendingUp} value="809"    label="Service Events" sub="2024 (gastronomy)" color={C.yellow} animate/>
+              <StatCard icon={Users}      value="41,525" label="Passengers 2024"    sub="+24% vs 2023"        color={C.teal}/>
+              <StatCard icon={Navigation} value="36,501" label="Total Routes (km)"  sub="2024"                color={C.blue}/>
+              <StatCard icon={Activity}   value="24,816" label="Line Service (km)"  sub="2024"                color={C.green}/>
+              <StatCard icon={TrendingUp} value="809"    label="Service Events"     sub="2024 (gastronomy)"   color={C.yellow}/>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               <ChartCard title="Passengers & Route-km by Year" height={280}>
@@ -947,10 +947,10 @@ export default function Transportation() {
           <Container className="py-8">
             <SectionTitle icon={Train} title="Magdeburg Hauptbahnhof — Ticket Sales 1998–2019" subtitle="Source: Vertriebskennziffern | Local tickets collapsed; long-distance rail surged 15×" color={C.orange}/>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-              <StatCard icon={Train}      value="716k"    label="Total Tickets" sub="2019 (thousands)" color={C.orange} animate/>
-              <StatCard icon={Navigation} value="415k"    label="Long-Distance" sub="ICE/IC 2019" color={C.blue} animate/>
-              <StatCard icon={Activity}   value="165k"    label="Local/Regional" sub="2019 vs 977k in 1998" color={C.red} animate/>
-              <StatCard icon={TrendingUp} value="+1,474%" label="ICE growth" sub="1998 → 2012" color={C.green} animate/>
+              <StatCard icon={Train}      value="716k"    label="Total Tickets"   sub="2019 (thousands)"   color={C.orange}/>
+              <StatCard icon={Navigation} value="415k"    label="Long-Distance"   sub="ICE/IC 2019"        color={C.blue}/>
+              <StatCard icon={Activity}   value="165k"    label="Local/Regional"  sub="2019 vs 977k 1998"  color={C.red}/>
+              <StatCard icon={TrendingUp} value="+1,474%" label="ICE growth"      sub="1998 → 2012"        color={C.green}/>
             </div>
             <ChartCard title="Ticket Sales — Local vs Long-Distance (thousands)" height={320}>
               <ResponsiveContainer width="100%" height="100%">
@@ -967,7 +967,7 @@ export default function Transportation() {
                   <Legend wrapperStyle={{fontSize:11,color:C.muted}}/>
                   <Area type="monotone" dataKey="total"    name="Total"          stroke={C.purple} strokeWidth={2}   fill="url(#gHbfTotal)" isAnimationActive animationDuration={800}/>
                   <Area type="monotone" dataKey="longDist" name="Long-Distance"  stroke={C.blue}   strokeWidth={2.5} fill="url(#gHbfLong)"  isAnimationActive animationDuration={1000}/>
-                  <Area type="monotone" dataKey="local"    name="Local/Regional" stroke={C.orange} strokeWidth={2}   fill="url(#gHbfLocal}" isAnimationActive animationDuration={1100}/>
+                  <Area type="monotone" dataKey="local"    name="Local/Regional" stroke={C.orange} strokeWidth={2}   fill="url(#gHbfLocal)" isAnimationActive animationDuration={1100}/>
                 </AreaChart>
               </ResponsiveContainer>
             </ChartCard>
