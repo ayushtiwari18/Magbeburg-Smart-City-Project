@@ -38,7 +38,7 @@ const C = {
 
 const TABS = [
   { id: "overview",   label: "\uD83D\uDEE1\uFE0F Overview" },
-  { id: "trends",     label: "\uD83D\uDCC8 Accident Trends" },
+  { id: "trends",     label: "Accident Trends" },
   { id: "time",       label: "\u23F0 Time Patterns" },
   { id: "causes",     label: "\u26A0\uFE0F Causes" },
   { id: "severity",   label: "\uD83C\uDFAF Severity" },
@@ -238,10 +238,10 @@ export default function Safety() {
   const GRID2 = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 };
 
   const kpiTiles = [
-    { Icon: AlertTriangle, val: loading ? "—" : totalAccidents.toLocaleString(), label: "Accidents",   sub: "2017–2024",    color: "#60a5fa" },
-    { Icon: TrendingDown,  val: loading ? "—" : fatalities.toLocaleString(),     label: "Fatalities",  sub: "UKATEGORIE 1", color: "#f87171" },
-    { Icon: Users,         val: loading ? "—" : cyclistInvolved.toLocaleString(), label: "Cyclists",   sub: "IstRad = 1",   color: "#34d399" },
-    { Icon: MapPin,        val: loading ? "—" : pedestrianInvolved.toLocaleString(), label: "Pedestrians", sub: "IstFuss = 1", color: "#fbbf24" },
+    { Icon: AlertTriangle, val: loading ? "—" : totalAccidents.toLocaleString(),      label: "Accidents",   sub: "2017–2024",    color: "#60a5fa" },
+    { Icon: TrendingDown,  val: loading ? "—" : fatalities.toLocaleString(),           label: "Fatalities",  sub: "UKATEGORIE 1", color: "#f87171" },
+    { Icon: Users,         val: loading ? "—" : cyclistInvolved.toLocaleString(),      label: "Cyclists",    sub: "IstRad = 1",   color: "#34d399" },
+    { Icon: MapPin,        val: loading ? "—" : pedestrianInvolved.toLocaleString(),   label: "Pedestrians", sub: "IstFuss = 1",  color: "#fbbf24" },
   ];
 
   return (
@@ -250,7 +250,6 @@ export default function Safety() {
       {/* ── GLANCE BAR ── */}
       <div className="sticky top-0 z-40 bg-[#061B46] border-b border-white/10 shadow-xl">
         <div className="px-4 lg:px-8">
-          {/* title row */}
           <div className="flex items-center gap-4 py-2.5 border-b border-white/10">
             <div className="flex items-center gap-2.5 flex-shrink-0">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/20">
@@ -275,7 +274,6 @@ export default function Safety() {
               <Send size={11} /> Report Issue
             </button>
           </div>
-          {/* KPI tiles */}
           <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-white/10">
             {kpiTiles.map(k => (
               <div key={k.label} className="flex flex-col items-center justify-center py-3 px-2 text-center hover:bg-white/5 transition-colors cursor-default">
@@ -313,15 +311,15 @@ export default function Safety() {
             <>
               <SectionTitle icon={Shield} title="Safety at a Glance" subtitle="Snapshot 2017–2024 · Source: Unfallatlas Magdeburg (GeoJSON)" color={C.blue} />
               <div style={GRID}>
-                <StatCard icon={AlertTriangle} value={loading ? "—" : totalAccidents.toLocaleString()} label="Total Accidents"      sub="2017–2024" color={C.blue} />
-                <StatCard icon={TrendingDown}  value={loading ? "—" : fatalities.toLocaleString()}     label="Fatalities"          sub="UKATEGORIE = 1" delta="Most severe" color={C.red} />
-                <StatCard icon={Flame}         value={loading ? "—" : serious.toLocaleString()}         label="Serious Injuries"    sub="UKATEGORIE = 2" color={C.orange} />
-                <StatCard icon={AlertTriangle} value={loading ? "—" : minor.toLocaleString()}           label="Minor Accidents"     sub="UKATEGORIE = 3" color={C.yellow} />
-                <StatCard icon={Users}         value={loading ? "—" : cyclistInvolved.toLocaleString()} label="Cyclists Involved"   sub="IstRad = 1" color={C.green} />
-                <StatCard icon={MapPin}        value={loading ? "—" : pedestrianInvolved.toLocaleString()} label="Pedestrians"      sub="IstFuss = 1" color={C.purple} />
+                <StatCard icon={AlertTriangle} value={loading ? "—" : totalAccidents.toLocaleString()}      label="Total Accidents"    sub="2017–2024"       color={C.blue} />
+                <StatCard icon={TrendingDown}  value={loading ? "—" : fatalities.toLocaleString()}          label="Fatalities"         sub="UKATEGORIE = 1" delta="Most severe" color={C.red} />
+                <StatCard icon={Flame}         value={loading ? "—" : serious.toLocaleString()}             label="Serious Injuries"   sub="UKATEGORIE = 2"  color={C.orange} />
+                <StatCard icon={AlertTriangle} value={loading ? "—" : minor.toLocaleString()}               label="Minor Accidents"    sub="UKATEGORIE = 3"  color={C.yellow} />
+                <StatCard icon={Users}         value={loading ? "—" : cyclistInvolved.toLocaleString()}     label="Cyclists Involved"  sub="IstRad = 1"      color={C.green} />
+                <StatCard icon={MapPin}        value={loading ? "—" : pedestrianInvolved.toLocaleString()}  label="Pedestrians"        sub="IstFuss = 1"     color={C.purple} />
               </div>
               <div style={GRID2}>
-                <ChartCard title="\uD83D\uDCC8 Accident Trend 2010–2024" height={260}>
+                <ChartCard title="Accident Trend 2010–2024" height={260}>
                   {loading ? <Skeleton /> : yearData.length === 0 ? <NoData /> : (
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart data={yearData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
@@ -378,15 +376,15 @@ export default function Safety() {
                   const delta  = prev ? latest.total - prev.total : 0;
                   return (
                     <>
-                      <StatCard icon={AlertTriangle} value={latest.total.toLocaleString()} label={`Total ${latest.year}`} delta={`${delta >= 0 ? "+" : ""}${delta} vs prev`} color={C.blue} />
-                      <StatCard icon={TrendingDown}  value={latest.killed.toLocaleString()} label={`Fatalities ${latest.year}`} color={C.red} />
-                      <StatCard icon={Flame}         value={latest.injured.toLocaleString()} label={`Injured ${latest.year}`} color={C.orange} />
+                      <StatCard icon={AlertTriangle} value={latest.total.toLocaleString()}   label={`Total ${latest.year}`}      delta={`${delta >= 0 ? "+" : ""}${delta} vs prev`} color={C.blue} />
+                      <StatCard icon={TrendingDown}  value={latest.killed.toLocaleString()}  label={`Fatalities ${latest.year}`} color={C.red} />
+                      <StatCard icon={Flame}         value={latest.injured.toLocaleString()} label={`Injured ${latest.year}`}    color={C.orange} />
                       <StatCard icon={Activity}      value={yearData[0].total.toLocaleString()} label={`Total ${yearData[0].year}`} sub="Earliest year" color={C.muted} />
                     </>
                   );
                 })()}
               </div>
-              <ChartCard title="\uD83D\uDCC8 Annual Accident Totals with Fatalities Overlay 2010–2024" height={300}>
+              <ChartCard title="Annual Accident Totals with Fatalities Overlay 2010–2024" height={300}>
                 {loading ? <Skeleton /> : yearData.length === 0 ? <NoData /> : (
                   <ResponsiveContainer width="100%" height="100%">
                     <ComposedChart data={yearData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
@@ -518,7 +516,7 @@ export default function Safety() {
                   ))}
                 </div>
               )}
-              <ChartCard title="\uD83D\uDCCA Top Accident Causes (latest year)" height={300}>
+              <ChartCard title="Top Accident Causes (latest year)" height={300}>
                 {loading ? <Skeleton /> : causeData.length === 0 ? <NoData /> : (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={causeData} layout="vertical" margin={{ top: 0, right: 16, left: 4, bottom: 0 }}>
@@ -568,7 +566,7 @@ export default function Safety() {
                     </>
                   )}
                 </ChartCard>
-                <ChartCard title="\uD83D\uDCCA Severity Bar" height={280}>
+                <ChartCard title="Severity Bar" height={280}>
                   {loading ? <Skeleton /> : totalAccidents === 0 ? <NoData /> : (
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={severityData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -631,7 +629,6 @@ export default function Safety() {
                 )}
               </div>
 
-              {/* Initiatives */}
               <div style={{ marginTop: 40 }}>
                 <SectionTitle icon={Shield} title="Safety Initiatives" subtitle="Programmes powered by this data to keep Magdeburg safer" color={C.teal} />
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 16 }}>
@@ -660,7 +657,7 @@ export default function Safety() {
         </div>
       )}
 
-      {/* ── FAB (visible on non-report tabs) ── */}
+      {/* ── FAB ── */}
       {tab !== "report" && (
         <button onClick={() => setTab("report")} style={{
           position: "fixed", bottom: 28, right: 28, zIndex: 40,
@@ -676,7 +673,7 @@ export default function Safety() {
         </button>
       )}
 
-      {/* ── Modal (kept for glance-bar button) ── */}
+      {/* ── Modal ── */}
       {modalOpen && (
         <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)", animation: "fadeIn 0.2s ease" }}>
           <div style={{ width: "100%", maxWidth: 420, background: "#fff", borderRadius: 20, boxShadow: "0 24px 64px rgba(0,0,0,0.2)", animation: "scaleIn 0.2s ease" }}>
