@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import {
   Bus, Train, Moon, TreePine, Globe, Eye, EyeOff, Users, TrendingUp,
-  MapPin, Clock, Zap, ChevronLeft, ChevronRight, Car, Anchor, BarChart2,
+  MapPin, Clock, Zap, Car, Anchor, BarChart2,
   Activity, Leaf, Navigation
 } from "lucide-react";
 import {
@@ -533,44 +533,53 @@ export default function Transportation() {
         </Container>
       </div>
 
-      {/* ── LIVE MAP TAB — map small on top, charts large below */}
+      {/* ── LIVE MAP TAB — 40% map left | 60% stats right, both full viewport height */}
       {activeTab==="live" && (
-        <div style={{background:"#f8fafc"}}>
+        <div style={{display:"flex",height:"calc(100vh - 148px)",minHeight:520,background:"#f8fafc"}}>
 
-          {/* MAP — compact fixed height */}
-          <div style={{position:"relative",height:320,background:"#e8edf2"}}>
+          {/* LEFT — MAP 40% */}
+          <div style={{position:"relative",width:"40%",flexShrink:0,background:"#e8edf2"}}>
             <div ref={mapRef} style={{width:"100%",height:"100%"}}/>
+
             {/* LIVE badge */}
             <div className="absolute top-3 left-3 z-[999] bg-white/90 backdrop-blur rounded-lg px-3 py-1.5 border border-slate-200 shadow-sm flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500 inline-block" style={{animation:"ping 1.5s ease-in-out infinite"}}/>
               <span className="text-xs font-bold text-slate-700">LIVE</span>
               <span className="text-xs text-slate-400">vehicles · stops</span>
             </div>
-            {/* Loading spinner */}
+
+            {/* Loading */}
             {!allLoaded&&(<div className="absolute top-3 right-3 z-[999] bg-white/90 backdrop-blur rounded-full px-3 py-1 border border-slate-200 shadow-sm flex items-center gap-2 text-xs text-slate-500"><span style={{width:7,height:7,borderRadius:"50%",border:"1.5px solid #cbd5e1",borderTopColor:"#3b82f6",display:"inline-block",animation:"spin 0.8s linear infinite"}}/>Loading GTFS…</div>)}
-            {/* Legend overlay */}
+
+            {/* Legend */}
             <div className="absolute bottom-3 left-3 z-[999] bg-white/95 backdrop-blur rounded-xl p-2.5 border border-slate-200 shadow-sm">
               <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Legend</div>
-              <div className="flex gap-3 flex-wrap">
+              <div className="flex flex-col gap-1.5">
                 {OPERATORS.map(op=>{
                   const Icon=op.Icon;
-                  return(<div key={op.key} className="flex items-center gap-1.5" style={{opacity:visible.has(op.key)?1:0.25}}><div className="w-4 h-4 rounded flex items-center justify-center" style={{background:op.color}}><Icon size={8} color="white"/></div><span className="text-[9px] text-slate-600 font-semibold">{op.vehicleEmoji} {op.label}</span></div>);
+                  return(
+                    <div key={op.key} className="flex items-center gap-1.5" style={{opacity:visible.has(op.key)?1:0.25}}>
+                      <div className="w-4 h-4 rounded flex items-center justify-center" style={{background:op.color}}><Icon size={8} color="white"/></div>
+                      <span className="text-[9px] text-slate-600 font-semibold">{op.vehicleEmoji} {op.label}</span>
+                      <span className="text-[8px] text-slate-400 ml-1">{op.type}</span>
+                    </div>
+                  );
                 })}
               </div>
             </div>
           </div>
 
-          {/* DATA PANELS — full width below map */}
-          <div style={{padding:"20px 24px 32px",maxWidth:1400,margin:"0 auto"}}>
+          {/* RIGHT — STATS PANEL 60%, scrollable */}
+          <div style={{width:"60%",overflowY:"auto",background:"#f8fafc",borderLeft:"1px solid #e2e8f0",padding:"16px 20px 28px",scrollbarWidth:"none"}}>
 
-            {/* Row 1: MVB Ridership (area chart) + Routes donut */}
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
+            {/* Row 1: MVB Ridership + Routes by Operator */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
 
-              {/* MVB Ridership chart */}
-              <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{background:"#2563eb18"}}>
-                    <Users size={13} color={C.blue}/>
+              {/* MVB Ridership */}
+              <div className="rounded-[18px] border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{background:"#2563eb18"}}>
+                    <Users size={12} color={C.blue}/>
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-700 m-0">MVB Ridership</p>
@@ -578,23 +587,23 @@ export default function Transportation() {
                   </div>
                   {latestRidership && (
                     <div className="ml-auto text-right">
-                      <div className="text-xl font-bold tabular-nums text-[#061B46]">{(latestRidership.passengers/1e6).toFixed(1)}M</div>
+                      <div className="text-lg font-bold tabular-nums text-[#061B46]">{(latestRidership.passengers/1e6).toFixed(1)}M</div>
                       <div className="text-[10px] text-slate-400">{latestRidership.year}</div>
                     </div>
                   )}
                 </div>
                 {kissLoading ? (
-                  <div style={{height:200,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                    <div style={{width:24,height:24,borderRadius:"50%",border:"3px solid #e2e8f0",borderTopColor:"#2563eb",animation:"spin 0.8s linear infinite"}}/>
+                  <div style={{height:160,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <div style={{width:22,height:22,borderRadius:"50%",border:"3px solid #e2e8f0",borderTopColor:"#2563eb",animation:"spin 0.8s linear infinite"}}/>
                   </div>
                 ) : ridershipData.length === 0 ? (
-                  <div style={{height:200,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <div style={{height:160,display:"flex",alignItems:"center",justifyContent:"center"}}>
                     <p className="text-slate-400 text-sm">No data available</p>
                   </div>
                 ) : (
-                  <div style={{height:200}}>
+                  <div style={{height:160}}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={ridershipData} margin={{top:5,right:10,left:0,bottom:5}}>
+                      <AreaChart data={ridershipData} margin={{top:4,right:8,left:0,bottom:4}}>
                         <defs>
                           <linearGradient id="gRidership" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor={C.blue} stopOpacity={0.2}/>
@@ -602,25 +611,23 @@ export default function Transportation() {
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
-                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:11}} tickLine={false}/>
-                        <YAxis tickFormatter={v=>Math.round(v/1e6)+"M"} tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false}/>
-                        <Tooltip content={<LightTooltip/>}
-                          formatter={(v:number)=>[(v/1e6).toFixed(2)+"M","Passengers"]}/>
+                        <XAxis dataKey="year" tick={{fill:C.muted,fontSize:10}} tickLine={false}/>
+                        <YAxis tickFormatter={v=>Math.round(v/1e6)+"M"} tick={{fill:C.muted,fontSize:10}} tickLine={false} axisLine={false}/>
+                        <Tooltip formatter={(v:number)=>[(v/1e6).toFixed(2)+"M","Passengers"]}/>
                         <Area type="monotone" dataKey="passengers" name="Passengers" stroke={C.blue} strokeWidth={2.5} fill="url(#gRidership)" isAnimationActive animationDuration={1200}/>
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
                 )}
-                {/* mini bar rows repeated below the chart */}
                 {!kissLoading && ridershipData.length > 0 && (
-                  <div style={{marginTop:12,borderTop:"1px solid #f1f5f9",paddingTop:10}}>
+                  <div style={{marginTop:10,borderTop:"1px solid #f1f5f9",paddingTop:8}}>
                     {ridershipData.slice(-5).reverse().map(d=>(
-                      <div key={d.year} className="flex items-center gap-2 mb-1.5">
+                      <div key={d.year} className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-semibold text-blue-600 w-8 tabular-nums">{d.year}</span>
                         <div className="flex-1 h-1.5 bg-slate-100 rounded overflow-hidden">
                           <div style={{height:"100%",width:`${Math.round((d.passengers/maxPass)*100)}%`,background:"linear-gradient(90deg,#3b82f6,#06b6d4)",borderRadius:3,transition:"width 0.8s"}}/>
                         </div>
-                        <span className="text-xs text-slate-500 w-10 text-right tabular-nums">{(d.passengers/1e6).toFixed(1)}M</span>
+                        <span className="text-[11px] text-slate-500 w-10 text-right tabular-nums">{(d.passengers/1e6).toFixed(1)}M</span>
                       </div>
                     ))}
                   </div>
@@ -628,28 +635,29 @@ export default function Transportation() {
               </div>
 
               {/* Routes by Operator */}
-              <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{background:"#16a34a18"}}>
-                    <Navigation size={13} color={C.green}/>
+              <div className="rounded-[18px] border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{background:"#16a34a18"}}>
+                    <Navigation size={12} color={C.green}/>
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-700 m-0">Routes by Operator</p>
                     <p className="text-[10px] text-slate-400 m-0">GTFS · NASA GmbH</p>
                   </div>
-                  <div className="ml-auto text-xl font-bold tabular-nums text-[#061B46]">{totalRoutes>0?totalRoutes:"—"}<span className="text-xs font-normal text-slate-400 ml-1">routes</span></div>
+                  <div className="ml-auto text-lg font-bold tabular-nums text-[#061B46]">
+                    {totalRoutes>0?totalRoutes:"—"}<span className="text-xs font-normal text-slate-400 ml-1">routes</span>
+                  </div>
                 </div>
-                <div style={{marginBottom:16}}>
-                  <DonutChart segments={donutData} size={100}/>
+                <div style={{marginBottom:12}}>
+                  <DonutChart segments={donutData} size={88}/>
                 </div>
-                {/* Routes bar chart */}
-                <div style={{height:140}}>
+                <div style={{height:120}}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={donutData.length>0?donutData:[{label:"Loading",value:0,color:C.muted}]} margin={{top:4,right:8,left:0,bottom:4}} layout="vertical">
+                    <BarChart data={donutData.length>0?donutData:[{label:"Loading",value:0,color:C.muted}]} margin={{top:2,right:6,left:0,bottom:2}} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false}/>
                       <XAxis type="number" tick={{fill:C.muted,fontSize:10}} tickLine={false} axisLine={false}/>
-                      <YAxis type="category" dataKey="label" tick={{fill:C.muted,fontSize:11}} tickLine={false} axisLine={false} width={38}/>
-                      <Tooltip content={<LightTooltip/>}/>
+                      <YAxis type="category" dataKey="label" tick={{fill:C.muted,fontSize:10}} tickLine={false} axisLine={false} width={36}/>
+                      <Tooltip/>
                       <Bar dataKey="value" name="Routes" radius={[0,4,4,0]} isAnimationActive animationDuration={900}>
                         {donutData.map((d,i)=>(<Cell key={i} fill={d.color}/>))}
                       </Bar>
@@ -660,36 +668,34 @@ export default function Transportation() {
             </div>
 
             {/* Row 2: Departures by Hour + Operator Breakdown */}
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
 
               {/* Departures by Hour */}
-              <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{background:"#d9770618"}}>
-                    <Clock size={13} color={C.amber}/>
+              <div className="rounded-[18px] border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{background:"#d9770618"}}>
+                    <Clock size={12} color={C.amber}/>
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-700 m-0">Departures by Hour</p>
-                    <p className="text-[10px] text-slate-400 m-0">▲ amber = network peak · all visible operators</p>
+                    <p className="text-[10px] text-slate-400 m-0">▲ amber = network peak</p>
                   </div>
                 </div>
                 <PeakChart visible={visible}/>
-                {/* Hour labels clarification */}
-                <div className="flex justify-between mt-1">
+                <div className="flex justify-between mt-0.5 mb-3">
                   {["00","06","12","18"].map(h=>(<span key={h} className="text-[9px] text-slate-300">{h}h</span>))}
                 </div>
-                {/* Per-operator peak bar */}
-                <div style={{marginTop:14,display:"flex",flexDirection:"column",gap:6}}>
+                <div style={{display:"flex",flexDirection:"column",gap:5}}>
                   {OPERATORS.filter(op=>visible.has(op.key)).map(op=>{
                     const peakH=op.peakHours.indexOf(Math.max(...op.peakHours));
                     const mx=Math.max(...op.peakHours,1);
                     return(
                       <div key={op.key} className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold w-10" style={{color:op.color}}>{op.vehicleEmoji} {op.label}</span>
-                        <div className="flex-1 h-2 bg-slate-100 rounded overflow-hidden">
+                        <span className="text-[10px] font-bold w-12 shrink-0" style={{color:op.color}}>{op.vehicleEmoji} {op.label}</span>
+                        <div className="flex-1 h-1.5 bg-slate-100 rounded overflow-hidden">
                           <div style={{height:"100%",width:`${Math.round((op.peakHours[peakH]/mx)*100)}%`,background:op.color,borderRadius:3}}/>
                         </div>
-                        <span className="text-[10px] text-slate-400 w-6 text-right">{String(peakH).padStart(2,"0")}h</span>
+                        <span className="text-[10px] text-slate-400 w-6 text-right shrink-0">{String(peakH).padStart(2,"0")}h</span>
                       </div>
                     );
                   })}
@@ -697,14 +703,14 @@ export default function Transportation() {
               </div>
 
               {/* Operator Breakdown */}
-              <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{background:"#7c3aed18"}}>
-                    <TrendingUp size={13} color={C.purple}/>
+              <div className="rounded-[18px] border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{background:"#7c3aed18"}}>
+                    <TrendingUp size={12} color={C.purple}/>
                   </div>
                   <p className="text-sm font-bold text-slate-700 m-0">Operator Breakdown</p>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   {OPERATORS.map(op=>{
                     const peakH=op.peakHours.indexOf(Math.max(...op.peakHours));
                     const avgTrips=Math.round(op.peakHours.reduce((a,b)=>a+b,0)/Math.max(op.peakHours.filter(Boolean).length,1));
@@ -712,29 +718,29 @@ export default function Transportation() {
                     const mx=Math.max(...op.peakHours,1);
                     const pts=op.peakHours.map((v,h)=>`${(h/23)*90+5},${36-(v/mx)*28}`);
                     return(
-                      <div key={op.key} className="rounded-xl border p-3" style={{borderColor:visible.has(op.key)?op.color+"44":"#e2e8f0",opacity:visible.has(op.key)?1:0.4,transition:"opacity 0.2s"}}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{background:op.color}}><Icon size={11} color="white"/></div>
+                      <div key={op.key} className="rounded-xl border p-2.5" style={{borderColor:visible.has(op.key)?op.color+"44":"#e2e8f0",opacity:visible.has(op.key)?1:0.4,transition:"opacity 0.2s"}}>
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{background:op.color}}><Icon size={10} color="white"/></div>
                           <div>
                             <div className="text-xs font-bold" style={{color:"#061B46"}}>{op.vehicleEmoji} {op.label}</div>
-                            <div className="text-[9px] text-slate-400">{op.type}</div>
+                            <div className="text-[8px] text-slate-400 leading-tight">{op.type}</div>
                           </div>
                         </div>
-                        <div className="flex justify-between mb-2">
+                        <div className="flex justify-between mb-1.5">
                           <div className="text-center">
-                            <div className="text-sm font-bold tabular-nums" style={{color:op.color}}>{opLoading[op.key]?"…":(opStops[op.key]?.length??0).toLocaleString()}</div>
-                            <div className="text-[9px] text-slate-400">stops</div>
+                            <div className="text-xs font-bold tabular-nums" style={{color:op.color}}>{opLoading[op.key]?"…":(opStops[op.key]?.length??0).toLocaleString()}</div>
+                            <div className="text-[8px] text-slate-400">stops</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-sm font-bold" style={{color:op.color}}>{String(peakH).padStart(2,"0")}h</div>
-                            <div className="text-[9px] text-slate-400">peak</div>
+                            <div className="text-xs font-bold" style={{color:op.color}}>{String(peakH).padStart(2,"0")}h</div>
+                            <div className="text-[8px] text-slate-400">peak</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-sm font-bold" style={{color:op.color}}>{avgTrips}</div>
-                            <div className="text-[9px] text-slate-400">avg/h</div>
+                            <div className="text-xs font-bold" style={{color:op.color}}>{avgTrips}</div>
+                            <div className="text-[8px] text-slate-400">avg/h</div>
                           </div>
                         </div>
-                        <svg viewBox="0 0 100 40" style={{width:"100%",height:28}}>
+                        <svg viewBox="0 0 100 40" style={{width:"100%",height:24}}>
                           <defs><linearGradient id={`sp-${op.key}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={op.color} stopOpacity="0.2"/><stop offset="100%" stopColor={op.color} stopOpacity="0"/></linearGradient></defs>
                           <path d={`M${pts[0]} ${pts.slice(1).map(p=>`L${p}`).join(" ")} L95,40 L5,40 Z`} fill={`url(#sp-${op.key})`}/>
                           <polyline points={pts.join(" ")} fill="none" stroke={op.color} strokeWidth="1.5" strokeLinejoin="round"/>
