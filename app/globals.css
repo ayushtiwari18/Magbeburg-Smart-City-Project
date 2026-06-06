@@ -1,14 +1,56 @@
 @import "tailwindcss";
 
-* {
-  box-sizing: border-box;
+/* ─── Design tokens ─────────────────────────────────────────────────────────── */
+:root {
+  /* surfaces */
+  --bg-base:        #f8fafc;
+  --bg-card:        #ffffff;
+  --bg-subtle:      #f1f5f9;
+
+  /* text */
+  --text-primary:   #061b46;
+  --text-secondary: #475569;
+  --text-muted:     #94a3b8;
+
+  /* borders */
+  --border:         #e2e8f0;
+
+  /* navbar */
+  --nav-bg:         #ffffff;
+  --nav-border:     #e8edf5;
+
+  /* brand accent stays consistent */
+  --brand:          #061b46;
+  --brand-light:    #1e40af;
 }
+
+.dark {
+  --bg-base:        #0a0f1e;
+  --bg-card:        #111827;
+  --bg-subtle:      #1e293b;
+
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+
+  --border:         #1e293b;
+
+  --nav-bg:         #0d1526;
+  --nav-border:     #1e293b;
+
+  --brand:          #3b82f6;
+  --brand-light:    #60a5fa;
+}
+
+/* ─── Base reset ─────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: #f8fafc;
-  color: #061b46;
+  background: var(--bg-base);
+  color: var(--text-primary);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 a {
@@ -16,10 +58,46 @@ a {
   color: inherit;
 }
 
-/* Hide scrollbar utility */
+/* ─── Tailwind dark-mode overrides via CSS vars ─────────────────────────────── */
+/* Cards / panels */
+.dark .bg-white          { background-color: var(--bg-card) !important; }
+.dark .bg-\[\#f8fafc\]  { background-color: var(--bg-base) !important; }
+.dark .bg-slate-50       { background-color: var(--bg-subtle) !important; }
+.dark .bg-slate-100      { background-color: var(--bg-subtle) !important; }
+
+/* Borders */
+.dark .border-slate-200  { border-color: var(--border) !important; }
+.dark .border-\[\#e8edf5\] { border-color: var(--border) !important; }
+.dark .border-\[\#e1e7f0\] { border-color: var(--border) !important; }
+.dark .divide-\[\#e8edf5\] > * { border-color: var(--border) !important; }
+
+/* Text */
+.dark .text-\[\#061B46\] { color: var(--text-primary) !important; }
+.dark .text-\[\#061b46\] { color: var(--text-primary) !important; }
+.dark .text-slate-500    { color: var(--text-secondary) !important; }
+.dark .text-slate-400    { color: var(--text-muted) !important; }
+.dark .text-slate-600    { color: var(--text-secondary) !important; }
+
+/* Navbar specific */
+.dark header.sticky      { background-color: var(--nav-bg) !important; border-color: var(--nav-border) !important; }
+
+/* Inputs / selects in dark mode */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+/* Horizontal rules / dividers */
+.dark .bg-\[\#d9e1ef\]  { background-color: var(--border) !important; }
+
+/* ─── Scrollbar utility ──────────────────────────────────────────────────────── */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* ─── Animations ─────────────────────────────────────────────────────────────── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(28px); }
   to   { opacity: 1; transform: translateY(0); }
