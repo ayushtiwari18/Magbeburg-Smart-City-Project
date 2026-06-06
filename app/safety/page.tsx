@@ -26,6 +26,18 @@ const SEVERITY_LABEL: Record<number, string> = { 1: "Fatal", 2: "Serious", 3: "M
 
 const issueTypes = ["Broken Streetlight","Suspicious Activity","Road Hazard","Vandalism","Noise Complaint","Other"];
 
+// Safe helper — returns the column id only if the column was found
+function findColId(
+  columns: { id: string; label: string; unit?: string }[],
+  ...tests: Array<(id: string) => boolean>
+): string | undefined {
+  for (const test of tests) {
+    const col = columns.find(c => test(c.id));
+    if (col) return col.id;
+  }
+  return undefined;
+}
+
 function Bar({ value, max, color }: { value: number; max: number; color: string }) {
   return (
     <div className="flex items-center gap-2">
@@ -51,7 +63,6 @@ export default function Safety() {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", location: "", type: issueTypes[0], description: "" });
 
-  // Fetch GeoJSON + KISS-MD data in parallel
   useEffect(() => {
     const fetchAll = async () => {
       try {
@@ -67,48 +78,79 @@ export default function Safety() {
 
         if (yearRes.status === "fulfilled") {
           const d = yearRes.value;
-          const yearCol = d.columns.find(c => c.id.includes("jahr") || c.id.includes("year") || c.id === "jahr")?.id ?? "jahr";
-          const totalCol = d.columns.find(c => c.id.includes("gesamt") || c.id.includes("unfaelle") || c.id.includes("total"))?.id ?? d.columns[1]?.id;
-          const killedCol = d.columns.find(c => c.id.includes("getoetet") || c.id.includes("kill") || c.id.includes("tot"))?.id;
-          const injuredCol = d.columns.find(c => c.id.includes("verletzt") || c.id.includes("injured"))?.id;
-          setYearData(d.rows.map(r => ({
-            year: Number(r[yearCol]),
-            total: Number(r[totalCol] ?? 0),
-            killed: killedCol ? Number(r[killedCol] ?? 0) : 0,
-            injured: injuredCol ? Number(r[injuredCol] ?? 0) : 0,
-          })).filter(r => r.year >= 2010));
+          const cols = d.columns ?? [];
+          const yearCol  = findColId(cols, id => id.includes("jahr"), id => id.includes("year")) ?? cols[0]?.id;
+          const totalCol = findColId(cols, id => id.includes("gesamt"), id => id.includes("unfaelle"), id => id.includes("total")) ?? cols[1]?.id;
+          const killedCol  = findColId(cols, id => id.includes("getoetet"), id => id.includes("kill"), id => id.includes("tot"));
+          const injuredCol = findColId(cols, id => id.includes("verletzt"), id => id.includes("injured"));
+          if (yearCol && totalCol) {
+            setYearData(
+              d.rows
+                .map(r => ({
+                  year:    Number(r[yearCol]),
+                  total:   Number(r[totalCol] ?? 0),
+                  killed:  killedCol  ? Number(r[killedCol]  ?? 0) : 0,
+                  injured: injuredCol ? Number(r[injuredCol] ?? 0) : 0,
+                }))
+                .filter(r => r.year >= 2010)
+            );
+          }
         }
 
         if (hourRes.status === "fulfilled") {
           const d = hourRes.value;
-          const hourCol = d.columns.find(c => c.id.includes("uhr") || c.id.includes("stunde") || c.id.includes("hour"))?.id ?? d.columns[0]?.id;
-          const countCol = d.columns.find(c => c.id !== hourCol)?.id ?? d.columns[1]?.id;
-          setHourData(d.rows.map(r => ({ hour: Number(r[hourCol]), count: Number(r[countCol] ?? 0) })).sort((a,b) => a.hour - b.hour));
+          const cols = d.columns ?? [];
+          const hourCol  = findColId(cols, id => id.includes("uhr"), id => id.includes("stunde"), id => id.includes("hour")) ?? cols[0]?.id;
+          const countCol = cols.find(c => c.id !== hourCol)?.id ?? cols[1]?.id;
+          if (hourCol && countCol) {
+            setHourData(
+              d.rows
+                .map(r => ({ hour: Number(r[hourCol]), count: Number(r[countCol] ?? 0) }))
+                .sort((a, b) => a.hour - b.hour)
+            );
+          }
         }
 
         if (weekRes.status === "fulfilled") {
           const d = weekRes.value;
-          const dayCol = d.columns[0]?.id;
-          const countCol = d.columns[1]?.id;
-          setWeekdayData(d.rows.map(r => ({ day: String(r[dayCol]), count: Number(r[countCol] ?? 0) })));
+          const cols    = d.columns ?? [];
+          const dayCol   = cols[0]?.id;
+          const countCol = cols[1]?.id;
+          if (dayCol && countCol) {
+            setWeekdayData(d.rows.map(r => ({ day: String(r[dayCol]), count: Number(r[countCol] ?? 0) })));
+          }
         }
 
         if (causeRes.status === "fulfilled") {
           const d = causeRes.value;
-          const yearCol = d.columns.find(c => c.id.includes("jahr") || c.id.includes("year"))?.id ?? d.columns[0]?.id;
-          const causeCol = d.columns.find(c => c.id.includes("ursache") || c.id.includes("cause"))?.id;
-          const countCol = d.columns.find(c => !c.id.includes("jahr") && !c.id.includes("year") && c.id !== causeCol)?.id ?? d.columns[d.columns.length - 1]?.id;
-          // Aggregate latest year's causes
-          const years = [...new Set(d.rows.map(r => Number(r[yearCol])))].sort((a,b) => b-a);
-          const latestYear = years[0];
-          const latestRows = d.rows.filter(r => Number(r[yearCol]) === latestYear);
-          if (causeCol) {
-            setCauseData(latestRows.map(r => ({ cause: String(r[causeCol]), count: Number(r[countCol] ?? 0) })).sort((a,b) => b.count - a.count).slice(0, 6));
-          } else {
-            // Fallback: treat each column (except year) as a cause
-            const causeCols = d.columns.filter(c => !c.id.includes("jahr") && !c.id.includes("year"));
-            if (latestRows.length > 0) {
-              setCauseData(causeCols.map(c => ({ cause: c.label ?? c.id, count: Number(latestRows[0][c.id] ?? 0) })).sort((a,b) => b.count - a.count).slice(0, 6));
+          const cols = d.columns ?? [];
+          const yearCol  = findColId(cols, id => id.includes("jahr"), id => id.includes("year")) ?? cols[0]?.id;
+          const causeCol = findColId(cols, id => id.includes("ursache"), id => id.includes("cause"));
+          const countCol = cols.find(c => c.id !== yearCol && c.id !== causeCol)?.id ?? cols[cols.length - 1]?.id;
+
+          if (yearCol) {
+            const years = [...new Set(d.rows.map(r => Number(r[yearCol])))].sort((a, b) => b - a);
+            const latestYear = years[0];
+            const latestRows = d.rows.filter(r => Number(r[yearCol]) === latestYear);
+
+            if (causeCol && countCol) {
+              setCauseData(
+                latestRows
+                  .map(r => ({ cause: String(r[causeCol]), count: Number(r[countCol] ?? 0) }))
+                  .sort((a, b) => b.count - a.count)
+                  .slice(0, 6)
+              );
+            } else if (countCol) {
+              // Fallback: treat each non-year column as a cause
+              const causeCols = cols.filter(c => c.id !== yearCol);
+              if (latestRows.length > 0) {
+                setCauseData(
+                  causeCols
+                    .map(c => ({ cause: c.label ?? c.id, count: Number(latestRows[0][c.id] ?? 0) }))
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, 6)
+                );
+              }
             }
           }
         }
@@ -126,12 +168,10 @@ export default function Safety() {
     if (!geo || !mapRef.current) return;
     if (typeof window === "undefined") return;
 
-    // Load Leaflet from CDN if not already loaded
     const initMap = () => {
       const L = (window as unknown as { L: typeof import("leaflet") }).L;
       if (!L || !mapRef.current) return;
 
-      // Check if map already initialised on this div
       if ((mapRef.current as HTMLElement & { _leaflet_id?: number })._leaflet_id) return;
 
       const map = L.map(mapRef.current, { center: [52.1205, 11.6276], zoom: 12 });
@@ -144,9 +184,9 @@ export default function Safety() {
         type: "FeatureCollection" as const,
         features: geo.features.filter(f => {
           if (activeYear && f.properties.UJAHR !== activeYear) return false;
-          if (activeFilter === "cyclist" && !f.properties.IstRad) return false;
+          if (activeFilter === "cyclist"    && !f.properties.IstRad)  return false;
           if (activeFilter === "pedestrian" && !f.properties.IstFuss) return false;
-          if (activeFilter === "fatal" && f.properties.UKATEGORIE !== 1) return false;
+          if (activeFilter === "fatal"      && f.properties.UKATEGORIE !== 1) return false;
           return true;
         }),
       };
@@ -169,7 +209,9 @@ export default function Safety() {
             `<div class="text-xs leading-5">
               <strong>${SEVERITY_LABEL[p.UKATEGORIE ?? 3] ?? "Unknown"} accident</strong><br/>
               Year: ${p.UJAHR ?? "?"} &nbsp;·&nbsp; ${p.USTUNDE ?? "?"}:00h<br/>
-              ${p.IstRad ? "🚲 Cyclist &nbsp;" : ""}${p.IstFuss ? "🚶 Pedestrian &nbsp;" : ""}${p.IstPKW ? "🚗 Car" : ""}
+              ${p.IstRad  ? "🚲 Cyclist &nbsp;" : ""}${
+              p.IstFuss ? "🚶 Pedestrian &nbsp;" : ""}${
+              p.IstPKW  ? "🚗 Car" : ""}
             </div>`
           );
         },
@@ -179,7 +221,6 @@ export default function Safety() {
     if ((window as unknown as { L?: unknown }).L) {
       initMap();
     } else {
-      // Inject Leaflet CSS + JS
       if (!document.getElementById("leaflet-css")) {
         const link = document.createElement("link");
         link.id = "leaflet-css";
@@ -198,24 +239,29 @@ export default function Safety() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geo, activeYear, activeFilter]);
 
-  // Derived KPIs from GeoJSON
-  const features = geo?.features ?? [];
-  const totalAccidents = features.length;
-  const fatalities = features.filter(f => f.properties.UKATEGORIE === 1).length;
-  const cyclistInvolved = features.filter(f => f.properties.IstRad === 1).length;
-  const pedestrianInvolved = features.filter(f => f.properties.IstFuss === 1).length;
+  const features             = geo?.features ?? [];
+  const totalAccidents       = features.length;
+  const fatalities           = features.filter(f => f.properties.UKATEGORIE === 1).length;
+  const cyclistInvolved      = features.filter(f => f.properties.IstRad === 1).length;
+  const pedestrianInvolved   = features.filter(f => f.properties.IstFuss === 1).length;
 
-  const maxYear = Math.max(...yearData.map(d => d.total), 1);
-  const maxHour = Math.max(...hourData.map(d => d.count), 1);
-  const maxDay = Math.max(...weekdayData.map(d => d.count), 1);
-  const maxCause = Math.max(...causeData.map(d => d.count), 1);
+  const maxYear  = Math.max(...yearData.map(d => d.total),   1);
+  const maxHour  = Math.max(...hourData.map(d => d.count),   1);
+  const maxDay   = Math.max(...weekdayData.map(d => d.count),1);
+  const maxCause = Math.max(...causeData.map(d => d.count),  1);
 
-  const availableYears = [...new Set(features.map(f => f.properties.UJAHR).filter(Boolean) as number[])].sort((a,b) => a-b);
+  const availableYears = [...new Set(
+    features.map(f => f.properties.UJAHR).filter(Boolean) as number[]
+  )].sort((a, b) => a - b);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
-    setTimeout(() => { setModalOpen(false); setSubmitted(false); setForm({ name: "", location: "", type: issueTypes[0], description: "" }); }, 2200);
+    setTimeout(() => {
+      setModalOpen(false);
+      setSubmitted(false);
+      setForm({ name: "", location: "", type: issueTypes[0], description: "" });
+    }, 2200);
   };
 
   return (
@@ -257,10 +303,10 @@ export default function Safety() {
               ))
             ) : (
               [
-                { value: totalAccidents.toLocaleString(), label: "Accidents (2017–2024)", icon: AlertTriangle },
-                { value: fatalities.toLocaleString(), label: "Fatalities recorded", icon: TrendingDown },
-                { value: cyclistInvolved.toLocaleString(), label: "Cyclist involved", icon: Users },
-                { value: pedestrianInvolved.toLocaleString(), label: "Pedestrian involved", icon: MapPin },
+                { value: totalAccidents.toLocaleString(),     label: "Accidents (2017–2024)", icon: AlertTriangle },
+                { value: fatalities.toLocaleString(),          label: "Fatalities recorded",   icon: TrendingDown },
+                { value: cyclistInvolved.toLocaleString(),    label: "Cyclist involved",       icon: Users },
+                { value: pedestrianInvolved.toLocaleString(), label: "Pedestrian involved",    icon: MapPin },
               ].map((s, i) => {
                 const Icon = s.icon;
                 return (
@@ -286,7 +332,6 @@ export default function Safety() {
                 Source: Unfallatlas der Statistischen Ämter — Datenlizenz Deutschland v2.0
               </p>
             </div>
-            {/* Filters */}
             <div className="flex flex-wrap gap-2">
               {(["all", "cyclist", "pedestrian", "fatal"] as const).map(f => (
                 <button key={f} onClick={() => setActiveFilter(f)}
@@ -301,7 +346,6 @@ export default function Safety() {
             </div>
           </div>
 
-          {/* Year filter pills */}
           {availableYears.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               <button onClick={() => setActiveYear(null)}
@@ -317,7 +361,6 @@ export default function Safety() {
             </div>
           )}
 
-          {/* Legend */}
           <div className="flex gap-4 mb-4">
             {([1,2,3] as const).map(cat => (
               <div key={cat} className="flex items-center gap-1.5">
@@ -346,7 +389,6 @@ export default function Safety() {
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            {/* Accidents by year */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingDown className="h-5 w-5 text-[#061B46]" />
@@ -372,7 +414,6 @@ export default function Safety() {
               )}
             </div>
 
-            {/* By hour */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <Clock className="h-5 w-5 text-[#061B46]" />
@@ -395,7 +436,6 @@ export default function Safety() {
               )}
             </div>
 
-            {/* By weekday */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <Calendar className="h-5 w-5 text-[#061B46]" />
@@ -418,7 +458,6 @@ export default function Safety() {
               )}
             </div>
 
-            {/* By cause */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <AlertTriangle className="h-5 w-5 text-[#061B46]" />
