@@ -8,15 +8,16 @@ import { Bell, Menu, X } from "lucide-react";
 import { useLang } from "@/context/LanguageContext";
 
 const navItems = [
-  { de: "Start",              en: "Home",              href: "/" },
-  { de: "Sicherheit",         en: "Safety",            href: "/safety" },
-  { de: "Mobilität",          en: "Transportation",    href: "/transportation" },
-  { de: "Klima",              en: "Climate",           href: "/climate" },
-  { de: "KI-Straßenlichter",  en: "AI Streetlights",   href: "/ai-streetlights" },
-  { de: "Projekte",           en: "Projects",          href: "/projects" },
-  { de: "Einblicke",          en: "Insights",          href: "/insights" },
-  { de: "Veranstaltungen",    en: "Events",            href: "/events" },
-  { de: "Karte",              en: "Map",               href: "/map" },
+  { de: "Start",             en: "Home",             href: "/" },
+  { de: "Sicherheit",        en: "Safety",           href: "/safety" },
+  { de: "Mobilität",         en: "Transportation",   href: "/transportation" },
+  { de: "Klima",             en: "Climate",          href: "/climate" },
+  { de: "KI-Straßenlichter", en: "AI Streetlights",  href: "/ai-streetlights" },
+  { de: "Projekte",          en: "Projects",         href: "/projects" },
+  { de: "Einblicke",         en: "Insights",         href: "/insights" },
+  { de: "Veranstaltungen",   en: "Events",           href: "/events" },
+  { de: "Karte",             en: "Map",              href: "/map" },
+  { de: "Wohnen",            en: "Housing",          href: "/housing" },
 ];
 
 export default function Navbar() {
@@ -59,7 +60,7 @@ export default function Navbar() {
           <div className="h-8 w-px bg-[#d9e1ef]" />
           <button
             onClick={toggle}
-            className="flex items-center gap-1.5 rounded-lg border border-[#e1e7f0] px-3 py-1.5 text-[13px] font-bold text-[#061B46] transition hover:bg-blue-50 hover:text-blue-700"
+            className="flex items-center gap-1.5 rounded-xl border border-[#e1e7f0] px-3 py-1.5 text-[13px] font-bold text-[#061B46] transition hover:bg-blue-50 hover:text-blue-700"
           >
             {lang === "de" ? "🇩🇪 DE" : "🇬🇧 EN"}
           </button>
@@ -90,7 +91,7 @@ export default function Navbar() {
                 <Bell size={18} /> {lang === "de" ? "Benachrichtigungen" : "Notifications"}
               </button>
               <button onClick={toggle}
-                className="rounded-lg border border-[#e1e7f0] px-3 py-1.5 text-sm font-bold text-[#061B46]">
+                className="rounded-xl border border-[#e1e7f0] px-3 py-1.5 text-sm font-bold text-[#061B46]">
                 {lang === "de" ? "🇩🇪 DE" : "🇬🇧 EN"}
               </button>
             </div>
