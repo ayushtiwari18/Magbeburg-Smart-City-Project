@@ -18,7 +18,8 @@ interface AccidentFeature {
 interface AccidentGeoJSON { type: string; features: AccidentFeature[]; }
 
 interface KissRow { [key: string]: number | string | null; }
-interface KissData { columns: { id: string; label: string; unit?: string }[]; rows: KissRow[]; }
+interface KissColumn { key: string; label: string | null; unit?: string; }
+interface KissData { columns: KissColumn[]; rows: KissRow[]; }
 
 const WEEKDAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const SEVERITY_COLOR: Record<number, string> = { 1: "#dc2626", 2: "#f97316", 3: "#facc15" };
@@ -26,14 +27,17 @@ const SEVERITY_LABEL: Record<number, string> = { 1: "Fatal", 2: "Serious", 3: "M
 
 const issueTypes = ["Broken Streetlight","Suspicious Activity","Road Hazard","Vandalism","Noise Complaint","Other"];
 
-// Safe helper — returns the column id only if the column was found
-function findColId(
-  columns: { id: string; label: string; unit?: string }[],
-  ...tests: Array<(id: string) => boolean>
+function findColKey(
+  columns: KissColumn[],
+  ...tests: Array<(value: string) => boolean>
 ): string | undefined {
   for (const test of tests) {
-    const col = columns.find(c => test(c.id));
-    if (col) return col.id;
+    const col = columns.find(c => {
+      const key = (c.key ?? "").toLowerCase();
+      const label = (c.label ?? "").toLowerCase();
+      return test(key) || test(label);
+    });
+    if (col) return col.key;
   }
   return undefined;
 }
@@ -79,10 +83,10 @@ export default function Safety() {
         if (yearRes.status === "fulfilled") {
           const d = yearRes.value;
           const cols = d.columns ?? [];
-          const yearCol  = findColId(cols, id => id.includes("jahr"), id => id.includes("year")) ?? cols[0]?.id;
-          const totalCol = findColId(cols, id => id.includes("gesamt"), id => id.includes("unfaelle"), id => id.includes("total")) ?? cols[1]?.id;
-          const killedCol  = findColId(cols, id => id.includes("getoetet"), id => id.includes("kill"), id => id.includes("tot"));
-          const injuredCol = findColId(cols, id => id.includes("verletzt"), id => id.includes("injured"));
+          const yearCol  = findColKey(cols, value => value.includes("jahr"), value => value.includes("year")) ?? cols[0]?.key;
+          const totalCol = findColKey(cols, value => value.includes("gesamt"), value => value.includes("unfaelle"), value => value.includes("total")) ?? cols[1]?.key;
+          const killedCol  = findColKey(cols, value => value.includes("getoetet"), value => value.includes("kill"), value => value.includes("tot"));
+          const injuredCol = findColKey(cols, value => value.includes("verletzt"), value => value.includes("injured"));
           if (yearCol && totalCol) {
             setYearData(
               d.rows
@@ -100,8 +104,8 @@ export default function Safety() {
         if (hourRes.status === "fulfilled") {
           const d = hourRes.value;
           const cols = d.columns ?? [];
-          const hourCol  = findColId(cols, id => id.includes("uhr"), id => id.includes("stunde"), id => id.includes("hour")) ?? cols[0]?.id;
-          const countCol = cols.find(c => c.id !== hourCol)?.id ?? cols[1]?.id;
+          const hourCol  = findColKey(cols, value => value.includes("uhr"), value => value.includes("stunde"), value => value.includes("hour")) ?? cols[0]?.key;
+          const countCol = cols.find(c => c.key !== hourCol)?.key ?? cols[1]?.key;
           if (hourCol && countCol) {
             setHourData(
               d.rows
@@ -114,8 +118,8 @@ export default function Safety() {
         if (weekRes.status === "fulfilled") {
           const d = weekRes.value;
           const cols    = d.columns ?? [];
-          const dayCol   = cols[0]?.id;
-          const countCol = cols[1]?.id;
+          const dayCol   = cols[0]?.key;
+          const countCol = cols[1]?.key;
           if (dayCol && countCol) {
             setWeekdayData(d.rows.map(r => ({ day: String(r[dayCol]), count: Number(r[countCol] ?? 0) })));
           }
@@ -124,9 +128,9 @@ export default function Safety() {
         if (causeRes.status === "fulfilled") {
           const d = causeRes.value;
           const cols = d.columns ?? [];
-          const yearCol  = findColId(cols, id => id.includes("jahr"), id => id.includes("year")) ?? cols[0]?.id;
-          const causeCol = findColId(cols, id => id.includes("ursache"), id => id.includes("cause"));
-          const countCol = cols.find(c => c.id !== yearCol && c.id !== causeCol)?.id ?? cols[cols.length - 1]?.id;
+          const yearCol  = findColKey(cols, value => value.includes("jahr"), value => value.includes("year")) ?? cols[0]?.key;
+          const causeCol = findColKey(cols, value => value.includes("ursache"), value => value.includes("cause"));
+          const countCol = cols.find(c => c.key !== yearCol && c.key !== causeCol)?.key ?? cols[cols.length - 1]?.key;
 
           if (yearCol) {
             const years = [...new Set(d.rows.map(r => Number(r[yearCol])))].sort((a, b) => b - a);
@@ -141,12 +145,11 @@ export default function Safety() {
                   .slice(0, 6)
               );
             } else if (countCol) {
-              // Fallback: treat each non-year column as a cause
-              const causeCols = cols.filter(c => c.id !== yearCol);
+              const causeCols = cols.filter(c => c.key !== yearCol);
               if (latestRows.length > 0) {
                 setCauseData(
                   causeCols
-                    .map(c => ({ cause: c.label ?? c.id, count: Number(latestRows[0][c.id] ?? 0) }))
+                    .map(c => ({ cause: c.label ?? c.key, count: Number(latestRows[0][c.key] ?? 0) }))
                     .sort((a, b) => b.count - a.count)
                     .slice(0, 6)
                 );
@@ -163,7 +166,6 @@ export default function Safety() {
     fetchAll();
   }, []);
 
-  // Build Leaflet map once GeoJSON is loaded
   useEffect(() => {
     if (!geo || !mapRef.current) return;
     if (typeof window === "undefined") return;
@@ -236,7 +238,6 @@ export default function Safety() {
         document.head.appendChild(script);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geo, activeYear, activeFilter]);
 
   const features             = geo?.features ?? [];
@@ -266,7 +267,6 @@ export default function Safety() {
 
   return (
     <div className="bg-[#f8fafc] min-h-screen">
-      {/* Hero */}
       <section className="relative h-[420px] sm:h-[480px]">
         <Image src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1600&q=85" alt="Safety" fill priority sizes="100vw" className="object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#061B46]/90 via-[#061B46]/60 to-transparent" />
@@ -290,7 +290,6 @@ export default function Safety() {
         </div>
       </section>
 
-      {/* KPI bar */}
       <section className="bg-[#061B46]">
         <Container>
           <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-white/10">
@@ -322,7 +321,6 @@ export default function Safety() {
         </Container>
       </section>
 
-      {/* Map section */}
       <section className="py-16">
         <Container>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
@@ -384,11 +382,9 @@ export default function Safety() {
         </Container>
       </section>
 
-      {/* Charts row */}
       <section className="py-8 pb-20">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingDown className="h-5 w-5 text-[#061B46]" />
@@ -483,7 +479,6 @@ export default function Safety() {
         </Container>
       </section>
 
-      {/* Safety initiatives */}
       <section className="pb-20">
         <Container>
           <h2 className="text-3xl font-bold text-[#061B46] mb-3">Safety Initiatives</h2>
@@ -516,13 +511,11 @@ export default function Safety() {
         </Container>
       </section>
 
-      {/* FAB */}
       <button onClick={() => setModalOpen(true)}
         className="fixed bottom-8 right-8 z-40 flex items-center gap-2 rounded-full bg-[#061B46] px-5 py-3.5 text-sm font-bold text-white shadow-2xl transition hover:scale-105 hover:bg-blue-700 active:scale-95">
         <Send size={16} /> Report Issue
       </button>
 
-      {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
           <div className="w-full max-w-md rounded-[28px] bg-white shadow-2xl animate-scale-in">
